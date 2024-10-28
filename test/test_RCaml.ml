@@ -24,6 +24,21 @@ let vector_tests =
              |> NumericVector.mult (NumericVector.init_vec "c(5,2)")
              |> NumericVector.string_of_vec)
              ~printer:(fun x -> x) );
+         ( "" >:: fun _ ->
+           assert_equal "(3., 6.)"
+             (NumericVector.eval_vec [ "c(1,3)"; "+"; "c(2,3)" ]
+             |> NumericVector.string_of_vec)
+             ~printer:(fun x -> x) );
+         ( "" >:: fun _ ->
+           assert_equal "(2., 9.)"
+             (NumericVector.eval_vec [ "c(1,3)"; "*"; "c(2,3)" ]
+             |> NumericVector.string_of_vec)
+             ~printer:(fun x -> x) );
+         ( "" >:: fun _ ->
+           assert_equal "(2., 9.)"
+             (NumericVector.eval_vec [ "VARIABLE_NAME"; "<-"; "c(2,9)" ]
+             |> NumericVector.string_of_vec)
+             ~printer:(fun x -> x) );
        ]
 
 let _ = run_test_tt_main vector_tests

@@ -36,13 +36,14 @@ end
 module NumericVector : Vector with type elt = float = struct
   type elt = float
   type t = elt list
+
   (* AF: The list [v1; v2; .... ; vn] represents the vector (v1, v2, ... , vn).
      The list elements are in the same order as the vector elements. The empty
      vector is []. *)
   (* RI: None *)
-
-  let eval_vec x = failwith "TODO"
+  let vector_regex = Str.regexp "c(.*)"
   let empty = []
+  let eval_vec' x = List.map
   let letter_regex = Str.regexp "[a-zA-Z]+"
   let number_regex = Str.regexp "0-9"
 
@@ -82,4 +83,18 @@ module NumericVector : Vector with type elt = float = struct
 
   let add vec1 vec2 = prim_operation vec1 vec2 ( +. )
   let mult vec1 vec2 = prim_operation vec1 vec2 ( *. )
+
+  (* TODO: very messy to deal with strings in this module, should be abstracted
+     out. in the parsing, should be converted to specific variant types that
+     would make this much easier to work with with pattern matching. *)
+  let eval_vec x =
+    if List.length x = 1 then init_vec (List.hd x)
+    else if List.length x = 3 then
+      if List.nth x 1 = "+" then
+        add (List.hd x |> init_vec) (List.nth x 2 |> init_vec)
+      else if List.nth x 1 = "*" then
+        mult (List.hd x |> init_vec) (List.nth x 2 |> init_vec)
+      else if List.nth x 1 = "<-" then List.nth x 2 |> init_vec
+      else failwith "OTHER OPERATION NOT IMPLEMENTED YET"
+    else failwith "OTHER OPERATION NOT IMPLEMENTED YET"
 end
