@@ -1,0 +1,4 @@
+(executable
+ (public_name RCaml)
+ (name main)
+ (libraries RCaml))
