@@ -47,6 +47,10 @@ module NumericVector : Vector with type elt = float = struct
   let number_regex = Str.regexp "0-9"
 
   (* TODO: add check that vector inputted in R is formatted correctly. *)
+  (* TODO: x -3 seems sketchy, improve it*)
+  (* TODO: figure out a better way to format the output of the floats, and if it
+     is needed to use integers instead of always using floats as
+     representation *)
 
   (** [list_of_rvec x] is the list of elements in the R vector [x]. *)
   let list_of_rvec x =
@@ -54,7 +58,6 @@ module NumericVector : Vector with type elt = float = struct
     let comma_string = Str.string_before comma_string (String.length x - 3) in
     String.split_on_char ',' comma_string
 
-  (* TODO: figure out how to match the characters inside of the parentheses*)
   let init_vec x =
     let elem_list = list_of_rvec x in
     elem_list |> List.map (fun num_str -> float_of_string num_str)
@@ -63,15 +66,20 @@ module NumericVector : Vector with type elt = float = struct
     let rec elements y =
       match y with
       | [] -> ""
-      | h :: [] ->
-          let () = print_endline (string_of_float h) in
-          string_of_float h
+      | h :: [] -> string_of_float h
       | h :: t -> string_of_float h ^ ", " ^ elements t
     in
     "(" ^ elements x ^ ")"
 
   exception UnequalLength
 
-  let add vec1 vec2 = failwith "TODO"
-  let mult x y = failwith "TODO"
+  (** [prim_operation vec1 vec2 prim_op] is each element of [vec1] and [vec2]
+      after applying [prim_op] on the the element v1 of vec1 and corresponding
+      element v1 of vec2. *)
+  let prim_operation vec1 vec2 prim_op =
+    if List.length vec1 <> List.length vec2 then raise UnequalLength
+    else List.map2 (fun elem1 elem2 -> prim_op elem1 elem2) vec1 vec2
+
+  let add vec1 vec2 = prim_operation vec1 vec2 ( +. )
+  let mult vec1 vec2 = prim_operation vec1 vec2 ( *. )
 end
