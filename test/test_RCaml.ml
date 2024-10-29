@@ -2,6 +2,8 @@ open OUnit
 open RCaml
 open RCaml.Vector
 
+let string_of_string_list lst = "[" ^ String.concat "; " lst ^ "]"
+
 let vector_tests =
   "vector test suite"
   >::: [
@@ -67,6 +69,26 @@ let vector_tests =
          ( "" >:: fun _ ->
            assert_equal "3."
              (Value.to_string (Value.eval_val [ "4.5"; "/"; "1.5" ])) );
+         (********** PROCESSLINES TESTS **********)
+         ( "" >:: fun _ ->
+           assert_equal [ "7."; "NA"; "6." ]
+             (ProcessLines.process_input
+                [
+                  [ "3"; "+"; "4" ];
+                  [ "x"; "<-"; "5"; "+"; "3" ];
+                  [ "x"; "-"; "2" ];
+                ])
+             ~printer:string_of_string_list );
+         ( "" >:: fun _ ->
+           assert_equal
+             [ "(3.,5.)"; "NA"; "d(7., 9.)" ]
+             (ProcessLines.process_input
+                [
+                  [ "c(1,2)"; "+"; "c(2,3)" ];
+                  [ "x"; "<-"; "c(5,7)" ];
+                  [ "x"; "+"; "c(2,2)" ];
+                ])
+             ~printer:string_of_string_list );
        ]
 
 let _ = run_test_tt_main vector_tests

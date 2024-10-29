@@ -1,17 +1,28 @@
-let var_hashmap = Hashtbl.create 10
+(* Declare the global hashmap as a mutable reference *)
+let var_hashmap = ref (Hashtbl.create 10)
 
 (** [add_var name] adds the key [name] with corresponding value [var_val] to the
     hashmap. *)
-let add_var name (var_val : string) = Hashtbl.add var_hashmap name var_val
+let add_var name (var_val : string) = Hashtbl.replace !var_hashmap name var_val
+(*Printf.printf "Added: %s = %s\n" name var_val (* Debugging *)*)
 
 (** [get_val name] gets the value corresponding to the key [name]. *)
-let get_val name = Hashtbl.find var_hashmap name
+let get_val name =
+  try
+    let value = Hashtbl.find !var_hashmap name in
+    (*Printf.printf "Fetched: %s = %s\n" name value;*)
+    value
+  with Not_found ->
+    (*Printf.printf "Variable %s not found\n" name;*)
+    raise (Failure ("Undefined variable: " ^ name))
 
 (** [is_var name] returns whether [name] is a key in the hashmap. *)
 let is_var name =
-  match Hashtbl.find_opt var_hashmap name with
-  | None -> false
-  | _ -> true
+  let result = Hashtbl.mem !var_hashmap name in
+  (*Printf.printf "is_var %s: %b\n" name result; *)
+  result
+
+let clear_var_hashmap () = var_hashmap := Hashtbl.create 10
 
 (** [sublist lst found] returns the portion of [lst] that is after the
     assignment symbol. *)
@@ -28,22 +39,31 @@ let is_assignment lst = List.mem "<-" lst
     computation. *)
 let is_vec_op lst = String.starts_with ~prefix:"c(" (List.hd lst)
 
-(** [convert_to_vals lst] turns all variable names in an input [lst] and returns
-    the output list with all variables converted to their value. *)
+(** [convert_to_vals lst] turns all variable names in an input [lst] into their
+    values, using the global [var_hashmap]. *)
 let rec convert_to_vals (lst : string list) =
   match lst with
   | [] -> []
-  | h :: t -> (if is_var h then get_val h else h) :: convert_to_vals t
+  | h :: t ->
+      let new_h = if is_var h then get_val h else h in
+      (*Printf.printf "Converted %s to %s\n" h new_h;*)
+      new_h :: convert_to_vals t
 
-(** [evaluate input] returns the evaluated version of the [input] expression. *)
+(** [evaluate input] returns the evaluated version of the [input] expression,
+    using the global [var_hashmap] for variable lookups. *)
 let evaluate (input : string list) : string =
   let to_eval = convert_to_vals input in
-  if is_vec_op to_eval then
-    Vector.NumericVector.(string_of_vec (eval_vec to_eval))
-  else Value.(to_string (eval_val to_eval))
+  (*Printf.printf "Evaluating expression: %s\n" (String.concat " " to_eval);*)
+  try
+    if is_vec_op to_eval then
+      Vector.NumericVector.(string_of_vec (eval_vec to_eval))
+    else Value.(to_string (eval_val to_eval))
+  with e ->
+    Printf.printf "Error during evaluation: %s\n" (Printexc.to_string e);
+    "NA"
 
-(** [process_line] takes in input line [lst] : string list and processes it into
-    a string. *)
+(** [process_line lst] processes a single input line [lst] using the global
+    [var_hashmap] for variable assignments and lookups. *)
 let process_line (lst : string list) : string =
   if is_assignment lst then (
     let rest = sublist lst false in
@@ -51,7 +71,15 @@ let process_line (lst : string list) : string =
     "NA")
   else evaluate lst
 
-let rec process_input (lst : string list list) : string list =
-  match lst with
-  | [] -> []
-  | h :: t -> process_line h :: process_input t
+(** [process_input lst] processes a list of lines [lst], using the global
+    variable hashmap for assignments and returns a list of results. *)
+let process_input (lst : string list list) : string list =
+  clear_var_hashmap ();
+  let rec aux acc lst =
+    match lst with
+    | [] -> List.rev acc
+    | h :: t ->
+        let res = process_line h in
+        aux (res :: acc) t
+  in
+  aux [] lst
