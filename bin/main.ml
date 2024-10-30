@@ -11,7 +11,10 @@ let fileProcessor (fileName : string) : string list list =
 let printToOutput (lst : string list) (output_file : string) : unit =
   try
     let output_channel = open_out output_file in
-    List.iter (fun line -> Printf.fprintf output_channel "%s\n" line) lst;
+    List.iter
+      (fun line ->
+        if line <> "NA" then Printf.fprintf output_channel "%s\n" line)
+      lst;
     close_out output_channel;
     Printf.printf "Successfully wrote to file: %s\n" output_file
   with e -> Printf.printf "Error writing to file: %s\n" (Printexc.to_string e)
