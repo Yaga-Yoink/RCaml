@@ -16,7 +16,8 @@ let printToOutput (lst : string list) (output_file : string) : unit =
     Printf.printf "Successfully wrote to file: %s\n" output_file
   with e -> Printf.printf "Error writing to file: %s\n" (Printexc.to_string e)
 
-let print_string_list lst = List.iter print_endline lst
+let print_string_list lst =
+  List.iter (fun s -> if s <> "NA" then print_endline s) lst
 
 let () =
   print_endline
