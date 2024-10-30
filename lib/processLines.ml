@@ -71,8 +71,6 @@ let process_line (lst : string list) : string =
     "NA")
   else evaluate lst
 
-(** [process_input lst] processes a list of lines [lst], using the global
-    variable hashmap for assignments and returns a list of results. *)
 let process_input (lst : string list list) : string list =
   clear_var_hashmap ();
   let rec aux acc lst =
