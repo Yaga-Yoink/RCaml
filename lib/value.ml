@@ -11,6 +11,7 @@ let get_op op =
 
 let eval_val lst =
   match lst with
+  | v1 :: [] -> float_of_string v1
   | v1 :: op :: v2 :: _ -> get_op op (float_of_string v1) (float_of_string v2)
   | _ -> invalid_arg "Only lists of 3 elements are supported."
 
