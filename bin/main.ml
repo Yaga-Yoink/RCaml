@@ -1,4 +1,5 @@
 open Batteries
+open RCaml.ProcessLines
 
 let fileProcessor (fileName : string) : string list list =
   BatFile.lines_of fileName
@@ -16,6 +17,6 @@ let printToOutput (lst : string list) (output_file : string) : unit =
   with e -> Printf.printf "Error writing to file: %s\n" (Printexc.to_string e)
 
 let () =
-  let sample_output = [ "7"; "c(1,13)" ] in
+  let sample_output = process_input (fileProcessor "data/sample.txt") in
   let outputFile = "data/sample_corrected.txt" in
   printToOutput sample_output outputFile
