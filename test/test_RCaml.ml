@@ -7,39 +7,39 @@ let string_of_string_list lst = "[" ^ String.concat "; " lst ^ "]"
 let vector_tests =
   "vector test suite"
   >::: [
-         (********** VECTOR TESTS **********)
+         (* ********* VECTOR TESTS ********* *)
          ( "" >:: fun _ ->
-           assert_equal "()"
+           assert_equal "c()"
              (NumericVector.empty |> NumericVector.string_of_vec)
              ~printer:(fun x -> x) );
          ( "" >:: fun _ ->
-           assert_equal "(2., 3.)"
+           assert_equal "c(2., 3.)"
              (NumericVector.init_vec "c(2,3)" |> NumericVector.string_of_vec)
              ~printer:(fun x -> x) );
          ( "" >:: fun _ ->
-           assert_equal "(7., 5.)"
+           assert_equal "c(7., 5.)"
              (NumericVector.init_vec "c(2,3)"
              |> NumericVector.add (NumericVector.init_vec "c(5,2)")
              |> NumericVector.string_of_vec)
              ~printer:(fun x -> x) );
          ( "" >:: fun _ ->
-           assert_equal "(10., 6.)"
+           assert_equal "c(10., 6.)"
              (NumericVector.init_vec "c(2,3)"
              |> NumericVector.mult (NumericVector.init_vec "c(5,2)")
              |> NumericVector.string_of_vec)
              ~printer:(fun x -> x) );
          ( "" >:: fun _ ->
-           assert_equal "(3., 6.)"
+           assert_equal "c(3., 6.)"
              (NumericVector.eval_vec [ "c(1,3)"; "+"; "c(2,3)" ]
              |> NumericVector.string_of_vec)
              ~printer:(fun x -> x) );
          ( "" >:: fun _ ->
-           assert_equal "(2., 9.)"
+           assert_equal "c(2., 9.)"
              (NumericVector.eval_vec [ "c(1,3)"; "*"; "c(2,3)" ]
              |> NumericVector.string_of_vec)
              ~printer:(fun x -> x) );
          ( "" >:: fun _ ->
-           assert_equal "(2., 9.)"
+           assert_equal "c(2., 9.)"
              (NumericVector.eval_vec [ "VARIABLE_NAME"; "<-"; "c(2,9)" ]
              |> NumericVector.string_of_vec)
              ~printer:(fun x -> x) );
@@ -81,7 +81,7 @@ let vector_tests =
              ~printer:string_of_string_list );
          ( "" >:: fun _ ->
            assert_equal
-             [ "(3.,5.)"; "NA"; "d(7., 9.)" ]
+             [ "c(3., 5.)"; "NA"; "c(7., 9.)" ]
              (ProcessLines.process_input
                 [
                   [ "c(1,2)"; "+"; "c(2,3)" ];

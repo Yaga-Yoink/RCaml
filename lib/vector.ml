@@ -70,7 +70,7 @@ module NumericVector : Vector with type elt = float = struct
       | h :: [] -> string_of_float h
       | h :: t -> string_of_float h ^ ", " ^ elements t
     in
-    "(" ^ elements x ^ ")"
+    "c(" ^ elements x ^ ")"
 
   exception UnequalLength
 
