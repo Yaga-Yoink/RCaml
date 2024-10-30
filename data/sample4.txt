@@ -1,6 +1,6 @@
 3.14 * 2
-hello_world <- c(5,2.1,6.3) + c(11,0,-2)
-goodbye_world <- c(0,0,0)
+hello_world <- c(5,2.1) + c(11,0)
+goodbye_world <- c(0,0)
 hello_world + goodbye_world
 x <- 2
 6.7 * x
