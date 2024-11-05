@@ -1,3 +1,4 @@
 (test
  (name test_RCaml)
- (libraries ounit2 RCaml))
+ (libraries ounit2 RCaml)
+ (deps (glob_files_rec ../data/*)))

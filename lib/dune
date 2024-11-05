@@ -1,3 +1,3 @@
 (library
  (name RCaml)
- (libraries str))
+ (libraries str batteries))
