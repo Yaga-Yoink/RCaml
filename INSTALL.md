@@ -11,7 +11,7 @@ git clone git@github.coecis.cornell.edu:ak2498/RCaml.git
 
 cd RCaml/
 
-opam install batteries
+opam install batteries menhir
 ```
 
 ### Usage
