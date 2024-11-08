@@ -1,3 +1,5 @@
+type t
+
 val process_csv : string -> string array array
 (** [process_csv fileName] reads a CSV file named [fileName], where elements are
     separated by whitespace. It processes the content and returns it as a
