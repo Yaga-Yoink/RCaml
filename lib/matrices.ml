@@ -1,5 +1,7 @@
 open Batteries
 
+type t = string array array
+
 let process_csv (fileName : string) : string array array =
   BatFile.lines_of fileName
   |> BatEnum.map (fun line ->
