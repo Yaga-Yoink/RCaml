@@ -21,7 +21,7 @@ rule read =
     | "/" { DIVIDE }
     | "<-" { ASSIGNMENT }
     | "," { COMMA }
-    | digit { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
+    | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
     | id { VAR ( Lexing.lexeme lexbuf ) }
     | eof { EOF }
 

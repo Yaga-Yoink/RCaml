@@ -1,4 +1,4 @@
 (executable
  (public_name RCaml)
  (name main)
- (libraries RCaml batteries))
+ (libraries RCaml batteries interp))
