@@ -17,10 +17,12 @@
 
 
 %nonassoc ASSIGNMENT
+// nonassoc, no defined behavior for multiple assignments in the same expression
 %left PLUS
+%left MINUS
 %left MULT
 %left DIVIDE
-%left MINUS
+
 
 %start <Ast.expr> prog
 %%
@@ -29,6 +31,7 @@ prog:
     | e = expr; EOF { e };
 
 expr:
+    | LPAREN; e = expr; RPAREN { e }
     | f = FLOAT { Float f }
     | v = VAR { Var v }
     | e1 = expr; MULT; e2 = expr { Binop (Mult, e1, e2) }
