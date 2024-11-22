@@ -46,6 +46,13 @@ let eval_bop (bop : Ast.bop) (e1 : t) (e2 : t) : t =
   | Ast.Minus, VALUE v1, VALUE v2 -> VALUE (Value.minus v1 v2)
   | Ast.Mult, VALUE v1, VALUE v2 -> VALUE (Value.mult v1 v2)
   | Ast.Div, VALUE v1, VALUE v2 -> VALUE (Value.div v1 v2)
+  | Ast.Add, VALUE v, VECTOR vec | Ast.Add, VECTOR vec, VALUE v ->
+      VECTOR (Vector.ValueVector.add_val vec v)
+  | Ast.Minus, VECTOR vec, VALUE v ->
+      VECTOR (Vector.ValueVector.minus_val vec v)
+  | Ast.Mult, VALUE v, VECTOR vec | Ast.Mult, VECTOR vec, VALUE v ->
+      VECTOR (Vector.ValueVector.mult_val vec v)
+  | Ast.Div, VECTOR vec, VALUE v -> VECTOR (Vector.ValueVector.div_val vec v)
   | _ -> failwith "Not A Supported Operation"
 
 (** [eval_big e] is the AST [e] evaluated to the intermediary language between

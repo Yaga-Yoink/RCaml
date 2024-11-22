@@ -34,6 +34,22 @@ module type Vector' = sig
       [UnequalLength] if [x] and [y] are not the same length. Requires: [y] does
       not equal 0. *)
 
+  val add_val : t -> elt -> t
+  (** [add_val vec v] is the addition of each element in vector [vec] by value
+      [v]. *)
+
+  val minus_val : t -> elt -> t
+  (** [minus_val vec v] is the subtraction of each element in vector [vec] by
+      value [v]. *)
+
+  val mult_val : t -> elt -> t
+  (** [mult_val vec v] is the multiplication of each element in vector [vec] by
+      value [v]. *)
+
+  val div_val : t -> elt -> t
+  (** [div_val vec v] is the division of each element in vector [vec] by value
+      [v]. Requires: [v] does not equal 0. *)
+
   val string_of_vec : t -> string
   (** [string_of_vec x] is the string representation of [x]. *)
 end
@@ -75,4 +91,16 @@ module ValueVector : Vector' with type elt = Value.t = struct
   let minus vec1 vec2 = prim_operation vec1 vec2 Value.minus
   let mult vec1 vec2 = prim_operation vec1 vec2 Value.mult
   let div vec1 vec2 = prim_operation vec1 vec2 Value.div
+
+  let add_val vec v =
+    prim_operation vec (List.init (List.length vec) (fun _ -> v)) Value.add
+
+  let minus_val vec v =
+    prim_operation vec (List.init (List.length vec) (fun _ -> v)) Value.minus
+
+  let mult_val vec v =
+    prim_operation vec (List.init (List.length vec) (fun _ -> v)) Value.mult
+
+  let div_val vec v =
+    prim_operation vec (List.init (List.length vec) (fun _ -> v)) Value.div
 end
