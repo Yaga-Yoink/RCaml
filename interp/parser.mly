@@ -40,6 +40,7 @@ expr:
     | e1 = expr; MINUS; e2 = expr { Binop (Minus, e1, e2) }
     | e1 = expr; ASSIGNMENT; e2 = expr { Assignment (e1, e2) }
     | C; LPAREN; v = vector_values; RPAREN { Vector (v)}
+    | C { Var "c" }
 
 vector_values:
     | { [] }
