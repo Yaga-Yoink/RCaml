@@ -72,6 +72,11 @@ let vector_tests =
          make_simple_test [ "c(1, 2, 3) * 2" ] [ "c(2., 4., 6.)" ];
          make_simple_test [ "3 * c(3, 2, 1)" ] [ "c(9., 6., 3.)" ];
          make_simple_test [ "c(10, 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
+         (* RECURSIVE OPERATIONS INSIDE VECTOR *)
+         make_simple_test [ "c((2+ 8), 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
+         make_simple_test
+           [ "c((2+ 8), 8, ((10/2) + 1)) / 2" ]
+           [ "c(5., 4., 3.)" ];
          (********** TYPE CHECk TESTS **********)
          make_type_check_test
            [ "x <- 2"; "x <- c(1,2)" ]
