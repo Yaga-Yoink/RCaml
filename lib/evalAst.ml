@@ -84,7 +84,7 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
           begin
             match bop with
             | Add -> Vector (vec_h ValueType.add)
-            | Minus -> Vector (vec_h (fun x y -> ValueType.minus y x))
+            | Minus -> Vector (vec_h ValueType.minus)
             | Mult -> Vector (vec_h ValueType.mult)
             | Div -> Vector (vec_h ValueType.div)
           end

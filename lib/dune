@@ -1,3 +1,4 @@
 (library
  (name RCaml)
- (libraries str batteries interp))
+ (libraries str batteries interp)
+ (instrumentation (backend bisect_ppx)))

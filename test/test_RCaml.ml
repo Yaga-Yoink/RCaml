@@ -52,6 +52,7 @@ let vector_tests =
          make_simple_test [ "c(2,3) + c(5,2)" ] [ "c(7., 5.)" ];
          make_simple_test [ "c(2,3) * c(5,2)" ] [ "c(10., 6.)" ];
          make_simple_test [ "c(2,4) / c(1, 4)" ] [ "c(2., 1.)" ];
+         make_simple_test [ "c(2,4) - c(1, 4)" ] [ "c(1., 0.)" ];
          make_simple_test
            [ "VARIABLE_NAME <- c(2,9)"; "VARIABLE_NAME" ]
            [ "NA"; "c(2., 9.)" ];

@@ -1,8 +1,10 @@
 (library
- (name interp))
+ (name interp)
+ (instrumentation (backend bisect_ppx)))
 
 (menhir 
  (modules parser))
 
 (ocamllex lexer)
+
 
