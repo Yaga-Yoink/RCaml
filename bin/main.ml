@@ -24,7 +24,9 @@ let () =
     "Please insert a file to 'data' folder and insert Filename in form: \
      data/fileName. ";
   let fileName = read_line () in
-  let sample_output = process_input (fileProcessor fileName) in
+  let lines = fileProcessor fileName in
+  let _ = TypeCheck.typecheck_lines lines in
+  let sample_output = process_input lines in
   try
     let outputFile = fileName ^ ".evaluated" in
     printToOutput sample_output outputFile;
