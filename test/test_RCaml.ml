@@ -73,6 +73,8 @@ let vector_tests =
          make_simple_test [ "c(1, 2, 3) * 2" ] [ "c(2., 4., 6.)" ];
          make_simple_test [ "3 * c(3, 2, 1)" ] [ "c(9., 6., 3.)" ];
          make_simple_test [ "c(10, 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
+         make_simple_test [ "1 - c(3, 2, 1)" ] [ "c(-2., -1., 0.)" ];
+         make_simple_test [ "480 / c(10, 8, 6)" ] [ "c(48., 60., 80.)" ];
          (* RECURSIVE OPERATIONS INSIDE VECTOR *)
          make_simple_test [ "c((2+ 8), 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
          make_simple_test
