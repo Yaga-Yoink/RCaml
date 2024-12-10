@@ -21,6 +21,8 @@ let rec typeof (env : t) e =
   | Vector lst -> typeof_vector env lst
   | Assignment (Var name, e2) -> typeof_assignment env name e2
   | Assignment (e1, e2) -> raise (TypeException non_var_assignment_e)
+  | Function (name, lst1, lst2) -> failwith "TODO"
+  | Return e -> failwith "TODO"
 
 and typeof_bop env e1 e2 =
   match (typeof env e1, typeof env e2) with

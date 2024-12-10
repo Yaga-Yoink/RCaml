@@ -12,6 +12,8 @@ type expr =
   | Binop of bop * expr * expr
   | Vector of expr list
   | Assignment of expr * expr
+  | Function of expr * expr list * expr list
+  | Return of expr
 
 (** The type representing R types. *)
 type typ =

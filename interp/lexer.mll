@@ -21,6 +21,11 @@ rule read =
     | "/" { DIVIDE }
     | "<-" { ASSIGNMENT }
     | "," { COMMA }
+    (* | "{" { LBRACE } 
+    | "}" { RBRACE }
+    | "function" { FUNCTION }
+    | ";" { SEMICOLON }
+    | "return" { RETURN } *)
     | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
     | id { VAR ( Lexing.lexeme lexbuf ) }
     | eof { EOF }

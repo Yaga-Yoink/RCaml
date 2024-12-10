@@ -1,28 +1,26 @@
 open Interp
+open DynamicEnvironment
 
-(* Declare the global hashmap as a mutable reference. *)
-let var_hashmap = ref (Hashtbl.create 10)
+(* An empty dynamic environment which will track the changes to the environment
+   through evaluation of the AST. *)
+let env = ref DynamicEnvironment.empty
 
-(** [add_var name] adds the key [name] with corresponding value [var_val] to the
-    hashmap. *)
-let add_var name var_val = Hashtbl.replace !var_hashmap name var_val
-(*Printf.printf "Added: %s = %s\n" name var_val (* Debugging *)*)
+(* Declare the global hashmap as a mutable reference. let var_hashmap = ref
+   (Hashtbl.create 10)
 
-(** [get_val name] gets the value corresponding to the key [name]. *)
-let get_val name =
-  try
-    let value = Hashtbl.find !var_hashmap name in
-    (*Printf.printf "Fetched: %s = %s\n" name value;*)
-    value
-  with Not_found ->
-    (*Printf.printf "Variable %s not found\n" name;*)
-    raise (Failure ("Undefined variable: " ^ name))
+   (** [add_var name] adds the key [name] with corresponding value [var_val] to
+   the hashmap. *) let add_var name var_val = Hashtbl.replace !var_hashmap name
+   var_val (*Printf.printf "Added: %s = %s\n" name var_val (* Debugging *)*)
 
-(** [is_var name] returns whether [name] is a key in the hashmap. *)
-let is_var name =
-  let result = Hashtbl.mem !var_hashmap name in
-  (*Printf.printf "is_var %s: %b\n" name result; *)
-  result
+   (** [get_val name] gets the value corresponding to the key [name]. *) let
+   get_val name = try let value = Hashtbl.find !var_hashmap name in
+   (*Printf.printf "Fetched: %s = %s\n" name value;*) value with Not_found ->
+   (*Printf.printf "Variable %s not found\n" name;*) raise (Failure ("Undefined
+   variable: " ^ name))
+
+   (** [is_var name] returns whether [name] is a key in the hashmap. *) let
+   is_var name = let result = Hashtbl.mem !var_hashmap name in (*Printf.printf
+   "is_var %s: %b\n" name result; *) result *)
 
 (** [eval_bop_vec_h op value_of_expr expr_of_value vec1 vec2] is a helper
     function for evaluating the argument to the Vector constructor for [vec1]
@@ -53,13 +51,16 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Float x -> Float x
   | Var name ->
       (* Can't return just the name of a variable *)
-      if is_var name then get_val name else failwith "Unbound Variable"
+      DynamicEnvironment.lookup !env name
+      (* if is_var name then get_val name else failwith "Unbound Variable" *)
   | Binop (bop, e1, e2) -> eval_bop bop (eval_big e1) (eval_big e2)
   | Vector lst -> eval_vec lst
   | Assignment (Var name, e2) ->
-      add_var name (eval_big e2);
+      env := DynamicEnvironment.extend !env name (eval_big e2);
       Assignment (Var name, e2)
   | Assignment (e1, e2) -> failwith "Can Only Assign Value to a Name"
+  | Function (name, lst1, lst2) -> failwith "TODO"
+  | Return e -> failwith "TODO"
 
 (** [eval_vec lst] is the initialization of [lst] to a vector. *)
 and eval_vec (lst : Ast.expr list) : Ast.expr =
@@ -143,7 +144,7 @@ let rec eval_to_string = function
     end
   | Vector [] -> "c()"
   | Assignment (var, e) -> "NA"
-  | Var name -> eval_to_string (get_val name)
+  | Var name -> eval_to_string (DynamicEnvironment.lookup !env name)
   | _ -> failwith "Not A Valid AST Node to Print String"
 
 let process_input = List.map (fun line -> eval_big line |> eval_to_string)
