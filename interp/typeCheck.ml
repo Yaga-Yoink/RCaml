@@ -23,12 +23,21 @@ let rec typeof (env : t) e =
   | Assignment (e1, e2) -> raise (TypeException non_var_assignment_e)
   | Function (name, lst1, lst2) -> failwith "TODO"
   | Return e -> failwith "TODO"
+  | Bool e -> TBool
+  | Unop (unop, e) -> typeof_unop env e
+
+and typeof_unop env e =
+  match typeof env e with
+  | TFloat -> TFloat
+  | TVector e -> TVector e
+  | TBool -> TBool
 
 and typeof_bop env e1 e2 =
   match (typeof env e1, typeof env e2) with
   | TFloat, TFloat -> TFloat
   | TVector e1, TVector e2 ->
       if e1 = e2 then TVector e1 else raise (TypeException bop_type_mismatch_e)
+  | TBool, TBool -> TBool
   | _ -> raise (TypeException bop_type_mismatch_e)
 
 and typeof_vector env lst =

@@ -8,6 +8,7 @@ let rec string_of_ast_type = function
   | Interp.Ast.(TVector TFloat) -> "TFVector (TFloat)"
   | Interp.Ast.(TVector x) ->
       Printf.sprintf "TVector (%s)" (string_of_ast_type x)
+  | Interp.Ast.(TBool) -> "TBool"
 
 let string_of_string_list lst = "[" ^ String.concat "; " lst ^ "]"
 
@@ -66,7 +67,19 @@ let vector_tests =
          make_simple_test [ "2/1" ] [ "2." ];
          make_simple_test [ "0.5 + 1" ] [ "1.5" ];
          make_simple_test [ "4.5/ 1.5" ] [ "3." ];
-         (********** VECTOR-VALUE TESTS **********)
+         make_simple_test [ "TRUE" ] [ "TRUE" ];
+         make_simple_test [ "FALSE" ] [ "FALSE" ];
+         make_simple_test [ "TRUE & TRUE" ] [ "TRUE" ];
+         make_simple_test [ "TRUE | TRUE" ] [ "TRUE" ];
+         make_simple_test [ "TRUE & FALSE" ] [ "FALSE" ];
+         make_simple_test [ "FALSE & TRUE" ] [ "FALSE" ];
+         make_simple_test [ "TRUE | FALSE" ] [ "TRUE" ];
+         make_simple_test [ "FALSE | TRUE" ] [ "TRUE" ];
+         make_simple_test [ "FALSE | TRUE | TRUE" ] [ "TRUE" ];
+         make_simple_test [ "FALSE | TRUE | FALSE" ] [ "TRUE" ];
+         (* fix parentheses precedence *)
+         (* make_simple_test [ "TRUE | (FALSE & TRUE)" ] [ "FALSE" ]; *)
+         (********** VECTOR-FLOAT TESTS **********)
          make_simple_test [ "c(1, 2, 3) + 1" ] [ "c(2., 3., 4.)" ];
          make_simple_test [ "1 + c(0, 1, 2)" ] [ "c(1., 2., 3.)" ];
          make_simple_test [ "c(3, 2, 1) - 1" ] [ "c(2., 1., 0.)" ];
@@ -75,11 +88,50 @@ let vector_tests =
          make_simple_test [ "c(10, 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
          make_simple_test [ "1 - c(3, 2, 1)" ] [ "c(-2., -1., 0.)" ];
          make_simple_test [ "480 / c(10, 8, 6)" ] [ "c(48., 60., 80.)" ];
+         (********** VECTOR-BOOL TESTS **********)
+         make_simple_test
+           [ "!c(TRUE, FALSE, TRUE)" ]
+           [ "c(FALSE, TRUE, FALSE)" ];
+         make_simple_test
+           [ "c(FALSE, FALSE, FALSE) & c(FALSE, FALSE, FALSE)" ]
+           [ "c(FALSE, FALSE, FALSE)" ];
+         make_simple_test
+           [ "c(FALSE, FALSE, FALSE) | c(FALSE, FALSE, FALSE)" ]
+           [ "c(FALSE, FALSE, FALSE)" ];
+         make_simple_test
+           [ "c(FALSE, TRUE, FALSE) | c(FALSE, FALSE, FALSE)" ]
+           [ "c(FALSE, TRUE, FALSE)" ];
+         make_simple_test
+           [ "c(TRUE, TRUE, FALSE) | c(FALSE, FALSE, TRUE)" ]
+           [ "c(TRUE, TRUE, TRUE)" ];
+         make_simple_test
+           [
+             "c(TRUE, TRUE, FALSE) | c(FALSE, FALSE, TRUE) | c(FALSE, FALSE, \
+              FALSE)";
+           ]
+           [ "c(TRUE, TRUE, TRUE)" ];
+         make_simple_test
+           [
+             "c(TRUE, TRUE, FALSE) | c(FALSE, FALSE, FALSE) | c(FALSE, FALSE, \
+              TRUE)";
+           ]
+           [ "c(TRUE, TRUE, TRUE)" ];
+         make_simple_test
+           [
+             "c(TRUE, TRUE, FALSE) & c(FALSE, FALSE, FALSE) | c(FALSE, FALSE, \
+              TRUE)";
+           ]
+           [ "c(FALSE, FALSE, TRUE)" ];
          (* RECURSIVE OPERATIONS INSIDE VECTOR *)
          make_simple_test [ "c((2+ 8), 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
          make_simple_test
            [ "c((2+ 8), 8, ((10/2) + 1)) / 2" ]
            [ "c(5., 4., 3.)" ];
+         make_simple_test [ "c(TRUE & FALSE)" ] [ "c(FALSE)" ];
+         make_simple_test [ "c(TRUE | FALSE)" ] [ "c(TRUE)" ];
+         make_simple_test [ "c(TRUE & FALSE | TRUE)" ] [ "c(TRUE)" ];
+         make_simple_test [ "c(!TRUE)" ] [ "c(FALSE)" ];
+         make_simple_test [ "c(!FALSE)" ] [ "c(TRUE)" ];
          (********** TYPE CHECk TESTS **********)
          make_type_check_test
            [ "x <- 2"; "x <- c(1,2)" ]
@@ -93,9 +145,29 @@ let vector_tests =
            ];
          make_invalid_type_check_test [ "c(1,2) + 3" ]
            Interp.TypeCheck.bop_type_mismatch_e;
+         make_invalid_type_check_test [ "TRUE + 3" ]
+           Interp.TypeCheck.bop_type_mismatch_e;
+         make_invalid_type_check_test [ "FALSE - 3" ]
+           Interp.TypeCheck.bop_type_mismatch_e;
          make_invalid_type_check_test [ "4 <- c(1,2)" ]
            Interp.TypeCheck.non_var_assignment_e;
+         make_invalid_type_check_test [ "TRUE <- c(1,2)" ]
+           Interp.TypeCheck.non_var_assignment_e;
+         make_invalid_type_check_test
+           [ "FALSE & FALSE <- c(1,2)" ]
+           Interp.TypeCheck.non_var_assignment_e;
+         make_invalid_type_check_test
+           [ "c(FALSE, TRUE) & c(TRUE, FALSE) <- c(1,2)" ]
+           Interp.TypeCheck.non_var_assignment_e;
          make_invalid_type_check_test [ "x <- c(1, c(1,2))" ]
+           Interp.TypeCheck.vector_multi_type_e;
+         make_invalid_type_check_test [ "x <- c(TRUE, 1)" ]
+           Interp.TypeCheck.vector_multi_type_e;
+         make_invalid_type_check_test
+           [ "x <- c(TRUE, c(TRUE, FALSE))" ]
+           Interp.TypeCheck.vector_multi_type_e;
+         make_invalid_type_check_test
+           [ "x <- c(TRUE, c(TRUE & FALSE))" ]
            Interp.TypeCheck.vector_multi_type_e;
          (********** PROCESSLINES TESTS **********)
          ( "" >:: fun _ ->

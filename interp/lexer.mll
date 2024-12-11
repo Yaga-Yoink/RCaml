@@ -21,6 +21,11 @@ rule read =
     | "/" { DIVIDE }
     | "<-" { ASSIGNMENT }
     | "," { COMMA }
+    | "TRUE" { TRUE }
+    | "FALSE" { FALSE }
+    | "&" { AND }
+    | "|" { OR }
+    | "!" { NOT }
     (* | "{" { LBRACE } 
     | "}" { RBRACE }
     | "function" { FUNCTION }

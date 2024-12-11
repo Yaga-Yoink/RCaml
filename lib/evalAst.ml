@@ -61,6 +61,29 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Assignment (e1, e2) -> failwith "Can Only Assign Value to a Name"
   | Function (name, lst1, lst2) -> failwith "TODO"
   | Return e -> failwith "TODO"
+  | Bool e -> Bool e
+  | Unop (op, e) -> eval_unop op (eval_big e)
+
+and eval_unop (op : Ast.unop) (e : Ast.expr) =
+  match e with
+  | Ast.Bool e as b -> begin
+      match op with
+      | Not ->
+          Value.Bool.value_of_expr b |> Value.Bool.not'
+          |> Value.Bool.expr_of_value
+    end
+  | Ast.Vector (h :: t) -> begin
+      match (h, op) with
+      | Ast.Bool e, Not ->
+          eval_vec
+            (List.map
+               (fun x ->
+                 Value.Bool.value_of_expr x |> Value.Bool.not'
+                 |> Value.Bool.expr_of_value)
+               (h :: t))
+      | _ -> failwith "Operation Not Currently Supported"
+    end
+  | _ -> failwith "Expression Does Not Support Unops"
 
 (** [eval_vec lst] is the initialization of [lst] to a vector. *)
 and eval_vec (lst : Ast.expr list) : Ast.expr =
@@ -88,6 +111,19 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
             | Minus -> Vector (vec_h ValueType.minus)
             | Mult -> Vector (vec_h ValueType.mult)
             | Div -> Vector (vec_h ValueType.div)
+            | _ -> failwith "Binary Operation Not Supported on Value Vectors"
+          end
+      | Bool e ->
+          let module ValueType = Value.Bool in
+          let vec_h x =
+            eval_bop_vec2_h x ValueType.value_of_expr ValueType.expr_of_value
+              (h :: t) vec2
+          in
+          begin
+            match bop with
+            | And -> Vector (vec_h ValueType.and')
+            | Or -> Vector (vec_h ValueType.orr')
+            | _ -> failwith "Binary Operation Not Supported on Bool Vectors"
           end
       | _ -> failwith "Vector Only Supports Float Vectors"
     end
@@ -105,6 +141,7 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
       | Div ->
           Value.Number.(
             div (value_of_expr f1) (value_of_expr f2) |> expr_of_value)
+      | _ -> failwith "Operation Not Supported on Numbers"
     end
   | (Float x as f), Vector (h :: t) -> begin
       let module ValueType = Value.Number in
@@ -117,6 +154,18 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
       | Minus -> Vector (vec_h ValueType.minus)
       | Mult -> Vector (vec_h ValueType.mult)
       | Div -> Vector (vec_h ValueType.div)
+      | _ -> failwith "Operation Not Supported on Float and Vector Operation "
+    end
+  | (Bool x as b), Vector (h :: t) | Vector (h :: t), (Bool x as b) -> begin
+      let module ValueType = Value.Bool in
+      let vec_h x =
+        eval_bop_vec1_h x ValueType.value_of_expr ValueType.expr_of_value b
+          (h :: t)
+      in
+      match bop with
+      | And -> Vector (vec_h ValueType.and')
+      | Or -> Vector (vec_h ValueType.orr')
+      | _ -> failwith "Operation Not Supported on Boolean and Vector Operation "
     end
   | Vector (h :: t), (Float x as f) -> begin
       let module ValueType = Value.Number in
@@ -129,18 +178,33 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
       | Minus -> Vector (vec_h (fun x y -> ValueType.minus y x))
       | Mult -> Vector (vec_h ValueType.mult)
       | Div -> Vector (vec_h (fun x y -> ValueType.div y x))
+      | _ -> failwith "Operation Not Supported on Float and Vector Operation"
+    end
+  | (Bool e1 as b1), (Bool e2 as b2) -> begin
+      let bool_h x1 x2 op =
+        op (Value.Bool.value_of_expr x1) (Value.Bool.value_of_expr x2)
+        |> Value.Bool.expr_of_value
+      in
+      match bop with
+      | And -> bool_h b1 b2 Value.Bool.and'
+      | Or -> bool_h b1 b2 Value.Bool.orr'
+      | _ -> failwith "Not A Supported Binop For Booleans"
     end
   | _ -> failwith "Not A Supported Operation"
 
 (** [eval_to_string x] is the string representation of [x]. *)
 let rec eval_to_string = function
   | Ast.Float x as f -> Value.Number.to_string f
+  | Bool e as b -> Value.Bool.to_string b
   | Vector (h :: t) -> begin
       match h with
       | Float x ->
           let module ValueType = Value.Number in
-          Vector.string_of_vec Value.Number.to_string (Vector.init_vec (h :: t))
-      | _ -> failwith "Vector Only Supports Float Vectors"
+          Vector.string_of_vec ValueType.to_string (Vector.init_vec (h :: t))
+      | Bool e ->
+          let module ValueType = Value.Bool in
+          Vector.string_of_vec ValueType.to_string (Vector.init_vec (h :: t))
+      | _ -> failwith "Vector Only Supports Float and Boolean Vectors"
     end
   | Vector [] -> "c()"
   | Assignment (var, e) -> "NA"

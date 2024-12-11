@@ -26,3 +26,27 @@ module Number : sig
   val to_string : Ast.expr -> string
   (** [to_string v] is the string representation of Ast expression t. *)
 end
+
+module Bool : sig
+  type t
+  (* The type of the value. *)
+
+  val value_of_expr : Ast.expr -> t
+  (** [value_of_expr x] is value representation of a Ast.expr. Requires: x is an
+      Ast.Float. *)
+
+  val expr_of_value : t -> Ast.expr
+  (** [expr_of_value x] is the AST representation of the value [x]. *)
+
+  val and' : t -> t -> t
+  (** [and' x y] is boolean and logic of [x] and [y].*)
+
+  val orr' : t -> t -> t
+  (** [orr' x y] is boolean or logic of [x] or [y]. *)
+
+  val not' : t -> t
+  (** [not' x ] is boolean negation of [x] *)
+
+  val to_string : Ast.expr -> string
+  (** [to_string v] is the string representation of Ast expression t. *)
+end
