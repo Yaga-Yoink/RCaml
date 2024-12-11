@@ -1,23 +1,30 @@
+(* plot_vectors.ml *)
 open Plplot
 
-let () =
-  (* Set the output device to PNG and specify the file name *)
-  plsdev "png";
-  plsfnam "output.png";
+exception UnequalLength
 
-  (* Initialize PLplot *)
+(* Function to plot two lists of floats with a specified output file name *)
+let plot_vectors (vec1 : float list) (vec2 : float list) (output_file : string)
+    =
+  if List.length vec1 <> List.length vec2 then raise UnequalLength;
+
+  let x = Array.of_list vec1 in
+  let y = Array.of_list vec2 in
+
+  plsdev "png";
+  let name = output_file ^ ".png" in
+  plsfnam name;
+
   plinit ();
 
-  (* Set up the plot environment *)
-  plenv 0. 10. 0. 10. 0 0;
-  pllab "X-axis" "Y-axis" "A Simple Plot";
+  let xmin = Array.fold_left min max_float x in
+  let xmax = Array.fold_left max min_float x in
+  let ymin = Array.fold_left min max_float y in
+  let ymax = Array.fold_left max min_float y in
+  plenv xmin xmax ymin ymax 0 0;
+  pllab "X-axis" "Y-axis" "Vector Plot";
 
-  (* Data points *)
-  let x = [| 0.; 1.; 2.; 3. |] in
-  let y = [| 0.; 1.; 4.; 9. |] in
-
-  (* Draw a line connecting the points *)
   plline x y;
 
-  (* Clean up resources *)
-  plend ()
+  plend ();
+  Printf.printf "Plot saved as %s\n" output_file
