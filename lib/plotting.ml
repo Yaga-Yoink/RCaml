@@ -1,4 +1,3 @@
-(* plot_vectors.ml *)
 open Plplot
 
 exception UnequalLength
@@ -22,7 +21,7 @@ let plot_vectors (vec1 : float list) (vec2 : float list) (output_file : string)
   let ymin = Array.fold_left min max_float y in
   let ymax = Array.fold_left max min_float y in
   plenv xmin xmax ymin ymax 0 0;
-  pllab "X-axis" "Y-axis" "Vector Plot";
+  pllab "X-axis" "Y-axis" output_file;
 
   plline x y;
 
