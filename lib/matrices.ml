@@ -44,6 +44,16 @@ let dot_product vec1 vec2 =
   if n <> Array.length vec2 then failwith "The lengths of vectors don't match!"
   else Array.fold_right ( +. ) (Array.init n (fun i -> vec1.(i) *. vec2.(i))) 0.
 
+let add (lmat : t) (rmat : t) : t =
+  Array.mapi
+    (fun i row -> Array.mapi (fun j item -> lmat.(i).(j) +. rmat.(i).(j)) row)
+    lmat
+
+let subtract lmat rmat =
+  Array.mapi
+    (fun i row -> Array.mapi (fun j item -> lmat.(i).(j) -. rmat.(i).(j)) row)
+    lmat
+
 let multiply lmat rmat =
   if Array.length lmat.(0) <> Array.length rmat then
     failwith "Multiplication cannot be performed on these matrices"
