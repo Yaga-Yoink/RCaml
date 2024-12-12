@@ -24,6 +24,7 @@
 %token AND
 %token OR
 %token NOT
+%token PLOT
 
 
 %nonassoc ASSIGNMENT

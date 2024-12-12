@@ -12,6 +12,9 @@ val empty : t
 val init_vec : Ast.expr list -> t
 (** [init_vec x] is the vector representation of [x]. *)
 
+val init_vec_of_list : Ast.expr list -> float list
+(** [init_vec_of_list vector] converts [vector] to float list *)
+
 exception UnequalLength
 (** [UnequalLength] is raised when two vectors are unequal in length when they
     are required to be equal. *)

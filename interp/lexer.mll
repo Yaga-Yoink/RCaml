@@ -26,6 +26,7 @@ rule read =
     | "&" { AND }
     | "|" { OR }
     | "!" { NOT }
+    | "plot" { PLOT }
     (* | "{" { LBRACE } 
     | "}" { RBRACE }
     | "function" { FUNCTION }

@@ -21,6 +21,7 @@ type expr =
   | Function of expr * expr list * expr list
   | Return of expr
   | Bool of bool
+  | Plot of expr
 
 (** The type representing R types. *)
 type typ =
