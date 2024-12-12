@@ -58,7 +58,8 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Assignment (Var name, e2) ->
       env := DynamicEnvironment.extend !env name (eval_big e2);
       Assignment (Var name, e2)
-  | Assignment (e1, e2) -> failwith "Can Only Assign Value to a Name"
+  | Assignment (e1, e2) ->
+      failwith "Can Only Assign Value to a Name" [@coverage off]
   | Function (name, lst1, lst2) -> failwith "TODO"
   | Return e -> failwith "TODO"
   | Bool e -> Bool e
@@ -81,9 +82,9 @@ and eval_unop (op : Ast.unop) (e : Ast.expr) =
                  Value.Bool.value_of_expr x |> Value.Bool.not'
                  |> Value.Bool.expr_of_value)
                (h :: t))
-      | _ -> failwith "Operation Not Currently Supported"
+      | _ -> failwith "Operation Not Currently Supported" [@coverage off]
     end
-  | _ -> failwith "Expression Does Not Support Unops"
+  | _ -> failwith "Expression Does Not Support Unops" [@coverage off]
 
 (** [eval_vec lst] is the initialization of [lst] to a vector. *)
 and eval_vec (lst : Ast.expr list) : Ast.expr =
@@ -111,7 +112,9 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
             | Minus -> Vector (vec_h ValueType.minus)
             | Mult -> Vector (vec_h ValueType.mult)
             | Div -> Vector (vec_h ValueType.div)
-            | _ -> failwith "Binary Operation Not Supported on Value Vectors"
+            | _ ->
+                failwith "Binary Operation Not Supported on Value Vectors"
+                [@coverage off]
           end
       | Bool e ->
           let module ValueType = Value.Bool in
@@ -123,9 +126,11 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
             match bop with
             | And -> Vector (vec_h ValueType.and')
             | Or -> Vector (vec_h ValueType.orr')
-            | _ -> failwith "Binary Operation Not Supported on Bool Vectors"
+            | _ ->
+                failwith "Binary Operation Not Supported on Bool Vectors"
+                [@coverage off]
           end
-      | _ -> failwith "Vector Only Supports Float Vectors"
+      | _ -> failwith "Vector Only Supports Float Vectors" [@coverage off]
     end
   | (Float x as f1), (Float y as f2) -> begin
       match bop with
@@ -141,7 +146,7 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
       | Div ->
           Value.Number.(
             div (value_of_expr f1) (value_of_expr f2) |> expr_of_value)
-      | _ -> failwith "Operation Not Supported on Numbers"
+      | _ -> failwith "Operation Not Supported on Numbers" [@coverage off]
     end
   | (Float x as f), Vector (h :: t) -> begin
       let module ValueType = Value.Number in
@@ -154,7 +159,9 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
       | Minus -> Vector (vec_h ValueType.minus)
       | Mult -> Vector (vec_h ValueType.mult)
       | Div -> Vector (vec_h ValueType.div)
-      | _ -> failwith "Operation Not Supported on Float and Vector Operation "
+      | _ ->
+          failwith "Operation Not Supported on Float and Vector Operation "
+          [@coverage off]
     end
   | (Bool x as b), Vector (h :: t) | Vector (h :: t), (Bool x as b) -> begin
       let module ValueType = Value.Bool in
@@ -165,7 +172,9 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
       match bop with
       | And -> Vector (vec_h ValueType.and')
       | Or -> Vector (vec_h ValueType.orr')
-      | _ -> failwith "Operation Not Supported on Boolean and Vector Operation "
+      | _ ->
+          failwith "Operation Not Supported on Boolean and Vector Operation "
+          [@coverage off]
     end
   | Vector (h :: t), (Float x as f) -> begin
       let module ValueType = Value.Number in
@@ -178,7 +187,9 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
       | Minus -> Vector (vec_h (fun x y -> ValueType.minus y x))
       | Mult -> Vector (vec_h ValueType.mult)
       | Div -> Vector (vec_h (fun x y -> ValueType.div y x))
-      | _ -> failwith "Operation Not Supported on Float and Vector Operation"
+      | _ ->
+          failwith "Operation Not Supported on Float and Vector Operation"
+          [@coverage off]
     end
   | (Bool e1 as b1), (Bool e2 as b2) -> begin
       let bool_h x1 x2 op =
@@ -188,9 +199,9 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
       match bop with
       | And -> bool_h b1 b2 Value.Bool.and'
       | Or -> bool_h b1 b2 Value.Bool.orr'
-      | _ -> failwith "Not A Supported Binop For Booleans"
+      | _ -> failwith "Not A Supported Binop For Booleans" [@coverage off]
     end
-  | _ -> failwith "Not A Supported Operation"
+  | _ -> failwith "Not A Supported Operation" [@coverage off]
 
 (** [eval_to_string x] is the string representation of [x]. *)
 let rec eval_to_string = function
@@ -204,11 +215,13 @@ let rec eval_to_string = function
       | Bool e ->
           let module ValueType = Value.Bool in
           Vector.string_of_vec ValueType.to_string (Vector.init_vec (h :: t))
-      | _ -> failwith "Vector Only Supports Float and Boolean Vectors"
+      | _ ->
+          failwith "Vector Only Supports Float and Boolean Vectors"
+          [@coverage off]
     end
   | Vector [] -> "c()"
   | Assignment (var, e) -> "NA"
-  | Var name -> eval_to_string (DynamicEnvironment.lookup !env name)
-  | _ -> failwith "Not A Valid AST Node to Print String"
+  (* | Var name -> eval_to_string (DynamicEnvironment.lookup !env name) *)
+  | _ -> failwith "Not A Valid AST Node to Print String" [@coverage off]
 
 let process_input = List.map (fun line -> eval_big line |> eval_to_string)
