@@ -4,7 +4,7 @@ type t
 exception NotNumMat
 (** An excpetion raised when a numeric matrix cannot be constructed. *)
 
-val process_csv : string -> t
+val process_csv : string -> string -> t
 (** [process_csv fileName] reads a CSV file named [fileName], where elements are
     separated by whitespace. It processes the content and returns it as a
     two-dimensional array of floats, with each row representing a line in the
@@ -64,3 +64,5 @@ val predict : t -> t -> float array -> float
     [new_vals] using the model created by [obs] and [response]. *)
 
 val string_of_t : t -> string
+val to_expr : t -> Interp.Ast.expr list list
+val of_expr : Interp.Ast.expr list list -> t

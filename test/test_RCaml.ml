@@ -10,6 +10,7 @@ let rec string_of_ast_type = function
   | Interp.Ast.(TVector x) ->
       Printf.sprintf "TVector (%s)" (string_of_ast_type x)
   | Interp.Ast.(TBool) -> "TBool"
+  | Interp.Ast.(TMatrix) -> "TMatrix"
   | Interp.Ast.(TString) -> "TString"
 
 let string_of_string_list lst = "[" ^ String.concat "; " lst ^ "]"
@@ -55,22 +56,26 @@ let make_invalid_type_check_test input message =
     [input] file returns a matrix equivalent to [output]. *)
 let make_process_csv_test input output =
   "" >:: fun _ ->
-  assert_equal output (Matrices.process_csv input) ~printer:Matrices.string_of_t
+  assert_equal output
+    (Matrices.process_csv input "../data/")
+    ~printer:Matrices.string_of_t
 
 (** [make_set_element_test input output row col i] creates a test to check that
     setting value [i] in the matrix in [input] at [row] and [col] gives
     [output]. *)
 let make_set_element_test input output row col i =
-  let mat = Matrices.process_csv input in
+  let mat = Matrices.process_csv input "../data/" in
   Matrices.set_element mat row col i;
   "" >:: fun _ ->
-  assert_equal (Matrices.process_csv output) mat ~printer:Matrices.string_of_t
+  assert_equal
+    (Matrices.process_csv output "../data/")
+    mat ~printer:Matrices.string_of_t
 
 (** [make_set_element_test input output row col i] creates a test to check that
     getting the value at [row] and [col] in the matrix in [input] gives
     [output]. *)
 let make_get_element_test input output row col =
-  let mat = Matrices.process_csv input in
+  let mat = Matrices.process_csv input "../data/" in
   "" >:: fun _ ->
   assert_equal output
     (Matrices.get_element mat row col)
@@ -132,7 +137,7 @@ let test_subtract_matrix input1 input2 output =
 
 let vector_tests =
   [
-    (* ********* VECTOR TESTS ********* *)
+    (********** VECTOR TESTS **********)
     make_simple_test [ "c(  )" ] [ "c()" ];
     make_simple_test [ "c(2,3)" ] [ "c(2., 3.)" ];
     make_simple_test [ "c(2,3) + c(5,2)" ] [ "c(7., 5.)" ];
@@ -181,6 +186,16 @@ let vector_float_tests =
     make_simple_test [ "c(10, 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
     make_simple_test [ "1 - c(3, 2, 1)" ] [ "c(-2., -1., 0.)" ];
     make_simple_test [ "480 / c(10, 8, 6)" ] [ "c(48., 60., 80.)" ];
+    ( "init_vec_of_list with valid Float list" >:: fun _ ->
+      let vec =
+        [ Interp.Ast.Float 1.2; Interp.Ast.Float 3.4; Interp.Ast.Float 5.6 ]
+      in
+      let expected = [ 1.2; 3.4; 5.6 ] in
+      assert_equal expected (init_vec_of_list vec) );
+    ( "init_vec_of_list with mixed-type list" >:: fun _ ->
+      let vec = [ Interp.Ast.Float 1.2; Interp.Ast.Bool true ] in
+      assert_raises (Failure "Expected a float expression") (fun () ->
+          init_vec_of_list vec) );
   ]
 
 let vector_bool_tests =
@@ -228,7 +243,7 @@ let vector_bool_tests =
 
 let vector_rec_tests =
   [
-    (* RECURSIVE OPERATIONS INSIDE VECTOR *)
+    (********** RECURSIVE OPERATIONS INSIDE VECTOR **********)
     make_simple_test [ "c((2+ 8), 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
     make_simple_test [ "c((2+ 8), 8, ((10/2) + 1)) / 2" ] [ "c(5., 4., 3.)" ];
     make_simple_test [ "c(TRUE & FALSE)" ] [ "c(FALSE)" ];
@@ -307,35 +322,35 @@ let matrix_tests =
     make_set_element_test "sample_csv.csv" "sample_csv2.csv" 2 2 100.;
     make_get_element_test "sample_csv.csv" 15. 4 3;
     make_get_element_test "sample_csv2.csv" 100. 2 2;
-    test_ncol (Matrices.process_csv "sample_csv.csv") 4;
+    test_ncol (Matrices.process_csv "sample_csv.csv" "../data/") 4;
     test_ncol
       (matrix
          (Array.of_list (List.init 16 (fun i -> float_of_int (2 * i))))
          16 1)
       1;
-    test_nrow (Matrices.process_csv "sample_csv.csv") 4;
+    test_nrow (Matrices.process_csv "sample_csv.csv" "../data/") 4;
     test_nrow
       (matrix
          (Array.of_list (List.init 16 (fun i -> float_of_int ((i * i) - 1))))
          16 1)
       16;
     test_transpose
-      (Matrices.process_csv "t_sample_csv.csv")
-      (Matrices.process_csv "sample_csv.csv");
+      (Matrices.process_csv "t_sample_csv.csv" "../data/")
+      (Matrices.process_csv "sample_csv.csv" "../data/");
     test_get_row
-      (Matrices.process_csv "sample_csv.csv")
+      (Matrices.process_csv "sample_csv.csv" "../data/")
       (Array.of_list [ 1.; 2.; 3.; 4. ])
       1;
     test_get_row
-      (Matrices.process_csv "sample_csv3.csv")
+      (Matrices.process_csv "sample_csv3.csv" "../data/")
       (Array.of_list [ 18.; 1.; 14.; 18.; 20. ])
       2;
     test_get_col
-      (Matrices.process_csv "sample_csv.csv")
+      (Matrices.process_csv "sample_csv.csv" "../data/")
       (Array.of_list [ 1.; 5.; 9.; 13. ])
       1;
     test_get_col
-      (Matrices.process_csv "sample_csv3.csv")
+      (Matrices.process_csv "sample_csv3.csv" "../data/")
       (Array.of_list [ 16.; 18. ])
       4;
     test_dot_product (Array.of_list [ 1.; 2. ]) (Array.of_list [ 3.; 4. ]) 11.;
@@ -344,13 +359,81 @@ let matrix_tests =
       (Array.of_list [ 3.; 4.; 2.; 0. ])
       20.8;
     test_add_matrix
-      (Matrices.process_csv "sample_csv.csv")
-      (Matrices.process_csv "sample_csv2.csv")
-      (Matrices.process_csv "sum_csv.csv");
+      (Matrices.process_csv "sample_csv.csv" "../data/")
+      (Matrices.process_csv "sample_csv2.csv" "../data/")
+      (Matrices.process_csv "sum_csv.csv" "../data/");
     test_subtract_matrix
-      (Matrices.process_csv "sample_csv.csv")
-      (Matrices.process_csv "sample_csv2.csv")
-      (Matrices.process_csv "subtract_csv.csv");
+      (Matrices.process_csv "sample_csv.csv" "../data/")
+      (Matrices.process_csv "sample_csv2.csv" "../data/")
+      (Matrices.process_csv "subtract_csv.csv" "../data/");
+    test_subtract_matrix
+      (Matrices.process_csv "sample_csv.csv" "../data/")
+      (Matrices.process_csv "sample_csv2.csv" "../data/")
+      (Matrices.process_csv "subtract_csv.csv" "../data/");
+  ]
+
+let additional_matrix_tests =
+  [
+    (* ( "NotNumMat exception test" >:: fun _ -> assert_raises
+       Matrices.NotNumMat (fun () -> Matrices.process_csv "invalid_csv.csv")
+       ); *)
+    ( "Index out of bounds test for set_element" >:: fun _ ->
+      assert_raises (Failure "Index out of bounds") (fun () ->
+          let mat = Matrices.process_csv "sample_csv.csv" "../data/" in
+          Matrices.set_element mat 10 10 100.0) );
+    ( "Index out of bounds test for get_element" >:: fun _ ->
+      assert_raises (Failure "Index out of bounds") (fun () ->
+          let mat = Matrices.process_csv "sample_csv.csv" "../data/" in
+          Matrices.get_element mat 10 10) );
+    ( "Matrix multiplication test with valid input" >:: fun _ ->
+      let lmat =
+        Matrices.matrix (Array.of_list [ 1.; 2.; 3.; 4.; 5.; 6. ]) 2 3
+      in
+      let rmat =
+        Matrices.matrix (Array.of_list [ 7.; 8.; 9.; 10.; 11.; 12. ]) 3 2
+      in
+      let expected =
+        Matrices.matrix (Array.of_list [ 58.; 64.; 139.; 154. ]) 2 2
+      in
+      assert_equal expected
+        (Matrices.multiply lmat rmat)
+        ~printer:Matrices.string_of_t );
+    ( "Matrix multiplication failure due to incompatible dimensions" >:: fun _ ->
+      let lmat =
+        Matrices.matrix (Array.of_list [ 1.; 2.; 3.; 4.; 5.; 6. ]) 2 3
+      in
+      let rmat = Matrices.matrix (Array.of_list [ 7.; 8.; 9.; 10. ]) 2 2 in
+      assert_raises
+        (Failure "Multiplication cannot be performed on these matrices")
+        (fun () -> Matrices.multiply lmat rmat) );
+    ( "Matrix inversion test with a valid square matrix" >:: fun _ ->
+      let mat = Matrices.matrix (Array.of_list [ 4.; 7.; 2.; 6. ]) 2 2 in
+      let expected = [| [| 0.6; -0.7 |]; [| -0.2; 0.4 |] |] in
+      let actual = Matrices.inverse mat in
+      let epsilon = 1e-6 in
+      Array.iteri
+        (fun i row ->
+          Array.iteri
+            (fun j value ->
+              let diff = abs_float (value -. expected.(i).(j)) in
+              assert_bool
+                (Printf.sprintf
+                   "Value mismatch at (%d, %d): expected %.6f but got %.6f" i j
+                   expected.(i).(j)
+                   value)
+                (diff < epsilon))
+            row)
+        actual );
+    ( "Matrix inversion failure for non-square matrix" >:: fun _ ->
+      let mat =
+        Matrices.matrix (Array.of_list [ 1.; 2.; 3.; 4.; 5.; 6. ]) 2 3
+      in
+      assert_raises (Failure "Matrix must be square to compute its inverse")
+        (fun () -> Matrices.inverse mat) );
+    ( "Matrix inversion failure for singular matrix" >:: fun _ ->
+      let mat = Matrices.matrix (Array.of_list [ 1.; 2.; 2.; 4. ]) 2 2 in
+      assert_raises (Failure "Matrix is singular and cannot be inverted")
+        (fun () -> Matrices.inverse mat) );
   ]
 
 let plot_tests =
@@ -367,6 +450,8 @@ let test_cases =
       typecheck_tests;
       processlines_tests;
       matrix_tests;
+      additional_matrix_tests;
+      plot_tests;
     ]
 
 let test_suite = "RCaml" >::: test_cases

@@ -16,9 +16,9 @@ let string_of_t (mat : t) : string =
     mat
   |> Array.fold_left ( ^ ) ""
 
-let process_csv (fileName : string) : t =
+let process_csv (fileName : string) dir : t =
   let string_mat =
-    BatFile.lines_of ("../data/" ^ fileName)
+    BatFile.lines_of (dir ^ fileName)
     |> BatEnum.map (fun line ->
            line |> String.split_on_char ','
            |> List.filter (fun word -> word <> "")
@@ -129,3 +129,21 @@ let predict obs response new_vals =
         1
         (Array.length new_vals + 1))
      betas).(0).(0)
+
+let to_expr (mat : t) : Interp.Ast.expr list list =
+  Array.to_list
+    (Array.map
+       (fun row -> Array.to_list (Array.map (fun x -> Interp.Ast.Float x) row))
+       mat)
+
+let of_expr (exprs : Interp.Ast.expr list list) : t =
+  Array.of_list
+    (List.map
+       (fun row ->
+         Array.of_list
+           (List.map
+              (function
+                | Interp.Ast.Float f -> f
+                | _ -> failwith "Invalid expression type in matrix")
+              row))
+       exprs)

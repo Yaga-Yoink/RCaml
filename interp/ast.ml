@@ -24,6 +24,7 @@ type expr =
   | Bool of bool
   | Readcsv of expr
   | Plot of expr * expr * expr
+  | Matrix of expr list list
 
 (** The type representing R types. *)
 type typ =
@@ -31,3 +32,4 @@ type typ =
   | TBool
   | TString
   | TVector of typ
+  | TMatrix
