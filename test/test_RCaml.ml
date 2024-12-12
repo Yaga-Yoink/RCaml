@@ -353,6 +353,9 @@ let matrix_tests =
       (Matrices.process_csv "subtract_csv.csv");
   ]
 
+let plot_tests =
+  [ make_simple_test [ "plot(c(1,2), c(2,4), 'name')" ] [ "NA" ] ]
+
 let test_cases =
   List.flatten
     [
