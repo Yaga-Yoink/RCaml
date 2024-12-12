@@ -49,7 +49,16 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Unop (op, e) -> eval_unop op (eval_big e)
   | Plot (e1, e2, name) -> eval_plot (eval_big e1) (eval_big e2) (eval_big name)
 
-and eval_plot e1 e2 name = failwith "TODO"
+and eval_plot e1 e2 name =
+  match name with
+  | Var name_str -> begin
+      match (e1, e2) with
+      | Vector v1, Vector v2 ->
+          Plotting.plot_vectors v1 v2 name_str;
+          Plot (e1, e2, name)
+      | _, _ -> failwith "First Two Arguments Must be Vectors"
+    end
+  | _ -> failwith "3rd Argument to Plot Should be A String" [@coverage off]
 
 and eval_unop (op : Ast.unop) (e : Ast.expr) =
   match e with
@@ -207,6 +216,7 @@ let rec eval_to_string = function
     end
   | Vector [] -> "c()"
   | Assignment (var, e) -> "NA"
+  | Plot _ -> "NA"
   (* | Var name -> eval_to_string (DynamicEnvironment.lookup !env name) *)
   | _ -> failwith "Not A Valid AST Node to Print String" [@coverage off]
 

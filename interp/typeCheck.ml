@@ -27,9 +27,12 @@ let rec typeof (env : t) e =
   | Unop (unop, e) -> typeof_unop env e
   | Plot (vec1, vec2, expr) -> typeof_plot env vec1 vec2 expr
 
-and typeof_plot env vec1 vec2 expr = failwith "TODO"
-(* match typeof env vec1, typeof env vec2, typeof env expr with | TVector e1,
-   TVector e2, name -> failwith "TODO" *)
+and typeof_plot env vec1 vec2 expr =
+  match (typeof env vec1, typeof env vec2, expr) with
+  | TVector e1, TVector e2, Var name ->
+      if e1 = TFloat && e2 = TFloat then TVector TFloat
+      else failwith "Plot Only Supported With Float Vectors"
+  | _ -> failwith "Plot Only Supported With Float Vectors"
 
 and typeof_unop env e =
   match typeof env e with
