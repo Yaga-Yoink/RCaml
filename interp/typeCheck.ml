@@ -25,6 +25,11 @@ let rec typeof (env : t) e =
   | Return e -> failwith "TODO"
   | Bool e -> TBool
   | Unop (unop, e) -> typeof_unop env e
+  | Plot (vec1, vec2, expr) -> typeof_plot env vec1 vec2 expr
+
+and typeof_plot env vec1 vec2 expr = failwith "TODO"
+(* match typeof env vec1, typeof env vec2, typeof env expr with | TVector e1,
+   TVector e2, name -> failwith "TODO" *)
 
 and typeof_unop env e =
   match typeof env e with

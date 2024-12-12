@@ -5,23 +5,6 @@ open DynamicEnvironment
    through evaluation of the AST. *)
 let env = ref DynamicEnvironment.empty
 
-(* Declare the global hashmap as a mutable reference. let var_hashmap = ref
-   (Hashtbl.create 10)
-
-   (** [add_var name] adds the key [name] with corresponding value [var_val] to
-   the hashmap. *) let add_var name var_val = Hashtbl.replace !var_hashmap name
-   var_val (*Printf.printf "Added: %s = %s\n" name var_val (* Debugging *)*)
-
-   (** [get_val name] gets the value corresponding to the key [name]. *) let
-   get_val name = try let value = Hashtbl.find !var_hashmap name in
-   (*Printf.printf "Fetched: %s = %s\n" name value;*) value with Not_found ->
-   (*Printf.printf "Variable %s not found\n" name;*) raise (Failure ("Undefined
-   variable: " ^ name))
-
-   (** [is_var name] returns whether [name] is a key in the hashmap. *) let
-   is_var name = let result = Hashtbl.mem !var_hashmap name in (*Printf.printf
-   "is_var %s: %b\n" name result; *) result *)
-
 (** [eval_bop_vec_h op value_of_expr expr_of_value vec1 vec2] is a helper
     function for evaluating the argument to the Vector constructor for [vec1]
     and [vec2] using the operation [op] between the two vectors. [value_of_expr]
@@ -64,6 +47,9 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Return e -> failwith "TODO"
   | Bool e -> Bool e
   | Unop (op, e) -> eval_unop op (eval_big e)
+  | Plot (e1, e2, name) -> eval_plot (eval_big e1) (eval_big e2) (eval_big name)
+
+and eval_plot e1 e2 name = failwith "TODO"
 
 and eval_unop (op : Ast.unop) (e : Ast.expr) =
   match e with

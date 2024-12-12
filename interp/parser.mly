@@ -52,6 +52,7 @@ line:
     // | e1 = expr; ASSIGNMENT; FUNCTION; LPAREN; e2 = separated_list(COMMA, expr); RPAREN; LBRACE; e3 = separated_nonempty_list(SEMICOLON, expr) { Function (e1, e2, e3) }
     // | RETURN; e4 = expr; SEMICOLON; RBRACE { Return (e4) }
     | C; LPAREN; v = vector_values; RPAREN { Vector (v)}
+    | PLOT; LPAREN; v1 = line; COMMA; v2 = line; COMMA; name = line; RPAREN { Plot (v1, v2, name)}
 
 binop:
     | e1 = line; MULT; e2 = line { Binop (Mult, e1, e2) }
