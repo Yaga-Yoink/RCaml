@@ -25,8 +25,17 @@ val get_row : t -> int -> float array
 val get_col : t -> int -> float array
 (** [get_col mat ncol] gets the [ncol] col from [mat]. *)
 
+val nrow : t -> int
+(** [nrow mat] returns the number of rows in matrix [mat]. *)
+
+val ncol : t -> int
+(** [ncol mat] returns the number of columns in matrix [mat]. *)
+
 val dot_product : float array -> float array -> float
 (** [dot_product vec1 vec2] returns the dot product of [vec1] and [vec2]. *)
+
+val add : t -> t -> t
+val subtract : t -> t -> t
 
 val multiply : t -> t -> t
 (** [multiply lmat rmat] returns the product of [lmat] and [rmat] where [lmat]

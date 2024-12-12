@@ -13,6 +13,11 @@ let rec string_of_ast_type = function
 
 let string_of_string_list lst = "[" ^ String.concat "; " lst ^ "]"
 
+(** [string_of_float_array arr] returns the string representation of input array
+    [arr]. *)
+let string_of_float_array (arr : float array) : string =
+  arr |> Array.map string_of_float |> Array.to_list |> String.concat ", "
+
 (** [string_of_ast_type_lst lst] is the string representation of the AST typ
     list [lst]. *)
 let string_of_ast_type_lst lst =
@@ -69,6 +74,60 @@ let make_get_element_test input output row col =
   assert_equal output
     (Matrices.get_element mat row col)
     ~printer:string_of_float
+
+(** [test_nrow input output] creates a test to check that the number of rows in
+    matrix [input] equals [ouput]. *)
+let test_nrow input output =
+  "" >:: fun _ ->
+  assert_equal output (Matrices.nrow input) ~printer:string_of_int
+
+(** [test_ncol input output] creates a test to check that the number of columns
+    in matrix [input] equals [ouput]. *)
+let test_ncol input output =
+  "" >:: fun _ ->
+  assert_equal output (Matrices.ncol input) ~printer:string_of_int
+
+(** [test_transpose input output] creates a test to check that the transpose of
+    the matrix [input] equals the matrix [output]. *)
+let test_transpose input output =
+  "" >:: fun _ ->
+  assert_equal output (Matrices.transpose input) ~printer:string_of_t
+
+(** [get_row input output] creates a test to check that get_row will return
+    array [output] when asked for row [row] of the matrix [input]. *)
+let test_get_row input output row =
+  "" >:: fun _ ->
+  assert_equal output
+    (Matrices.get_row input row)
+    ~printer:string_of_float_array
+
+(** [get_col input output] creates a test to check that get_col will return
+    array [output] when asked for row [row] of the matrix [input]. *)
+let test_get_col input output col =
+  "" >:: fun _ ->
+  assert_equal output
+    (Matrices.get_col input col)
+    ~printer:string_of_float_array
+
+(** [test_dot_product input1 input2 output] creates a test to check that the dot
+    produce of [input1] and [input2] is [output]. *)
+let test_dot_product input1 input2 output =
+  "" >:: fun _ ->
+  assert_equal output
+    (Matrices.dot_product input1 input2)
+    ~printer:string_of_float
+
+(** [test_add_matrix input1 input2 output] creates a test to check that the sum
+    of matrix [input1] and matrix [input2] is matrix [output]. *)
+let test_add_matrix input1 input2 output =
+  "" >:: fun _ ->
+  assert_equal output (Matrices.add input1 input2) ~printer:string_of_t
+
+(** [test_subtract_matrix input1 input2 output] creates a test to check that the
+    sum of matrix [input1] and matrix [input2] is matrix [output]. *)
+let test_subtract_matrix input1 input2 output =
+  "" >:: fun _ ->
+  assert_equal output (Matrices.subtract input1 input2) ~printer:string_of_t
 
 let vector_tests =
   "vector test suite"
@@ -229,6 +288,54 @@ let vector_tests =
          make_set_element_test "sample_csv.csv" "sample_csv2.csv" 2 2 100.;
          make_get_element_test "sample_csv.csv" 15. 4 3;
          make_get_element_test "sample_csv2.csv" 100. 2 2;
+         test_ncol (Matrices.process_csv "sample_csv.csv") 4;
+         test_ncol
+           (matrix
+              (Array.of_list (List.init 16 (fun i -> float_of_int (2 * i))))
+              16 1)
+           1;
+         test_nrow (Matrices.process_csv "sample_csv.csv") 4;
+         test_nrow
+           (matrix
+              (Array.of_list
+                 (List.init 16 (fun i -> float_of_int ((i * i) - 1))))
+              16 1)
+           16;
+         test_transpose
+           (Matrices.process_csv "t_sample_csv.csv")
+           (Matrices.process_csv "sample_csv.csv");
+         test_get_row
+           (Matrices.process_csv "sample_csv.csv")
+           (Array.of_list [ 1.; 2.; 3.; 4. ])
+           1;
+         test_get_row
+           (Matrices.process_csv "sample_csv3.csv")
+           (Array.of_list [ 18.; 1.; 14.; 18.; 20. ])
+           2;
+         test_get_col
+           (Matrices.process_csv "sample_csv.csv")
+           (Array.of_list [ 1.; 5.; 9.; 13. ])
+           1;
+         test_get_col
+           (Matrices.process_csv "sample_csv3.csv")
+           (Array.of_list [ 16.; 18. ])
+           4;
+         test_dot_product
+           (Array.of_list [ 1.; 2. ])
+           (Array.of_list [ 3.; 4. ])
+           11.;
+         test_dot_product
+           (Array.of_list [ 0.; 2.2; 6.; 3. ])
+           (Array.of_list [ 3.; 4.; 2.; 0. ])
+           20.8;
+         test_add_matrix
+           (Matrices.process_csv "sample_csv.csv")
+           (Matrices.process_csv "sample_csv2.csv")
+           (Matrices.process_csv "sum_csv.csv");
+         test_subtract_matrix
+           (Matrices.process_csv "sample_csv.csv")
+           (Matrices.process_csv "sample_csv2.csv")
+           (Matrices.process_csv "subtract_csv.csv");
        ]
 
 let _ = run_test_tt_main vector_tests

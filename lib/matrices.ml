@@ -40,11 +40,11 @@ let matrix (vec : float array) nrow ncol : t =
   if Array.length vec <> nrow * ncol then failwith "Invalid dimensions"
   else Array.init_matrix nrow ncol (fun i j -> vec.((i * ncol) + j))
 
+let nrow (mat : t) = Array.length mat
+let ncol (mat : t) = Array.length mat.(0)
+
 let transpose mat : t =
-  Array.init_matrix
-    (Array.length mat.(0))
-    (Array.length mat)
-    (fun i j -> mat.(j).(i))
+  Array.init_matrix (ncol mat) (nrow mat) (fun i j -> mat.(j).(i))
 
 let get_row (mat : t) nrow = mat.(nrow - 1)
 
