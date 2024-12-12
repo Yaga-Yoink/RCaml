@@ -3,12 +3,14 @@ open Plplot
 exception UnequalLength
 
 (* Function to plot two lists of floats with a specified output file name *)
-let plot_vectors (vec1 : float list) (vec2 : float list) (output_file : string)
-    =
-  if List.length vec1 <> List.length vec2 then raise UnequalLength;
+let plot_vectors (vec1 : Vector.elt list) (vec2 : Vector.elt list)
+    (output_file : string) =
+  let vector1 = Vector.init_vec_of_list vec1 in
+  let vector2 = Vector.init_vec_of_list vec2 in
+  if List.length vector1 <> List.length vector2 then raise UnequalLength;
 
-  let x = Array.of_list vec1 in
-  let y = Array.of_list vec2 in
+  let x = Array.of_list vector1 in
+  let y = Array.of_list vector2 in
 
   plsdev "png";
   let name = output_file ^ ".png" in

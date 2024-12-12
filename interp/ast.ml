@@ -21,7 +21,11 @@ type expr =
   | Function of expr * expr list * expr list
   | Return of expr
   | Bool of bool
+<<<<<<< HEAD
   | Readcsv of expr
+=======
+  | Plot of expr * expr * expr
+>>>>>>> 7b06d0dea7d2b78ded3d79011dd980a18b0a5abb
 
 (** The type representing R types. *)
 type typ =

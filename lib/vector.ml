@@ -23,3 +23,10 @@ exception UnequalLength
 let map f vec = List.map f vec
 let map2 f vec1 vec2 = List.map2 f vec1 vec2
 let expr_of_vector (x : t) = x
+
+let float_of_expr expr =
+  match expr with
+  | Ast.Float f -> f
+  | _ -> failwith "Expected a float expression"
+
+let init_vec_of_list vec = List.map float_of_expr vec

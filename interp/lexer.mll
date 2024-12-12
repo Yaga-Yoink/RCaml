@@ -26,7 +26,11 @@ rule read =
     | "&" { AND }
     | "|" { OR }
     | "!" { NOT }
+<<<<<<< HEAD
     | "read.csv" { READCSV }
+=======
+    | "plot" { PLOT }
+>>>>>>> 7b06d0dea7d2b78ded3d79011dd980a18b0a5abb
     (* | "{" { LBRACE } 
     | "}" { RBRACE }
     | "function" { FUNCTION }

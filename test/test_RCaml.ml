@@ -131,212 +131,240 @@ let test_subtract_matrix input1 input2 output =
   assert_equal output (Matrices.subtract input1 input2) ~printer:string_of_t
 
 let vector_tests =
-  "vector test suite"
-  >::: [
-         (* ********* VECTOR TESTS ********* *)
-         make_simple_test [ "c(  )" ] [ "c()" ];
-         make_simple_test [ "c(2,3)" ] [ "c(2., 3.)" ];
-         make_simple_test [ "c(2,3) + c(5,2)" ] [ "c(7., 5.)" ];
-         make_simple_test [ "c(2,3) * c(5,2)" ] [ "c(10., 6.)" ];
-         make_simple_test [ "c(2,4) / c(1, 4)" ] [ "c(2., 1.)" ];
-         make_simple_test [ "c(2,4) - c(1, 4)" ] [ "c(1., 0.)" ];
-         make_simple_test
-           [ "VARIABLE_NAME <- c(2,9)"; "VARIABLE_NAME" ]
-           [ "NA"; "c(2., 9.)" ];
-         (********** VALUE TESTS **********)
-         make_simple_test [ "0 + 1" ] [ "1." ];
-         make_simple_test [ "0.5 + 1" ] [ "1.5" ];
-         make_simple_test [ "2 - 1" ] [ "1." ];
-         make_simple_test [ "2.5 - 1" ] [ "1.5" ];
-         make_simple_test [ "1*2" ] [ "2." ];
-         make_simple_test [ "0.5 * 3" ] [ "1.5" ];
-         make_simple_test [ "2/1" ] [ "2." ];
-         make_simple_test [ "0.5 + 1" ] [ "1.5" ];
-         make_simple_test [ "4.5/ 1.5" ] [ "3." ];
-         make_simple_test [ "TRUE" ] [ "TRUE" ];
-         make_simple_test [ "FALSE" ] [ "FALSE" ];
-         make_simple_test [ "TRUE & TRUE" ] [ "TRUE" ];
-         make_simple_test [ "TRUE | TRUE" ] [ "TRUE" ];
-         make_simple_test [ "TRUE & FALSE" ] [ "FALSE" ];
-         make_simple_test [ "FALSE & TRUE" ] [ "FALSE" ];
-         make_simple_test [ "TRUE | FALSE" ] [ "TRUE" ];
-         make_simple_test [ "FALSE | TRUE" ] [ "TRUE" ];
-         make_simple_test [ "FALSE | TRUE | TRUE" ] [ "TRUE" ];
-         make_simple_test [ "FALSE | TRUE | FALSE" ] [ "TRUE" ];
-         (* fix parentheses precedence *)
-         (* make_simple_test [ "TRUE | (FALSE & TRUE)" ] [ "FALSE" ]; *)
-         (********** VECTOR-FLOAT TESTS **********)
-         make_simple_test [ "c(1, 2, 3) + 1" ] [ "c(2., 3., 4.)" ];
-         make_simple_test [ "1 + c(0, 1, 2)" ] [ "c(1., 2., 3.)" ];
-         make_simple_test [ "c(3, 2, 1) - 1" ] [ "c(2., 1., 0.)" ];
-         make_simple_test [ "c(1, 2, 3) * 2" ] [ "c(2., 4., 6.)" ];
-         make_simple_test [ "3 * c(3, 2, 1)" ] [ "c(9., 6., 3.)" ];
-         make_simple_test [ "c(10, 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
-         make_simple_test [ "1 - c(3, 2, 1)" ] [ "c(-2., -1., 0.)" ];
-         make_simple_test [ "480 / c(10, 8, 6)" ] [ "c(48., 60., 80.)" ];
-         (********** VECTOR-BOOL TESTS **********)
-         make_simple_test
-           [ "!c(TRUE, FALSE, TRUE)" ]
-           [ "c(FALSE, TRUE, FALSE)" ];
-         make_simple_test
-           [ "c(FALSE, FALSE, FALSE) & c(FALSE, FALSE, FALSE)" ]
-           [ "c(FALSE, FALSE, FALSE)" ];
-         make_simple_test
-           [ "c(FALSE, FALSE, FALSE) | c(FALSE, FALSE, FALSE)" ]
-           [ "c(FALSE, FALSE, FALSE)" ];
-         make_simple_test
-           [ "c(FALSE, TRUE, FALSE) | c(FALSE, FALSE, FALSE)" ]
-           [ "c(FALSE, TRUE, FALSE)" ];
-         make_simple_test
-           [ "c(TRUE, TRUE, FALSE) | c(FALSE, FALSE, TRUE)" ]
-           [ "c(TRUE, TRUE, TRUE)" ];
-         make_simple_test
-           [
-             "c(TRUE, TRUE, FALSE) | c(FALSE, FALSE, TRUE) | c(FALSE, FALSE, \
-              FALSE)";
-           ]
-           [ "c(TRUE, TRUE, TRUE)" ];
-         make_simple_test
-           [
-             "c(TRUE, TRUE, FALSE) | c(FALSE, FALSE, FALSE) | c(FALSE, FALSE, \
-              TRUE)";
-           ]
-           [ "c(TRUE, TRUE, TRUE)" ];
-         make_simple_test
-           [
-             "c(TRUE, TRUE, FALSE) & c(FALSE, FALSE, FALSE) | c(FALSE, FALSE, \
-              TRUE)";
-           ]
-           [ "c(FALSE, FALSE, TRUE)" ];
-         make_simple_test
-           [ "TRUE & c(TRUE, FALSE, TRUE)" ]
-           [ "c(TRUE, FALSE, TRUE)" ];
-         make_simple_test
-           [ "TRUE | c(TRUE, FALSE, TRUE)" ]
-           [ "c(TRUE, TRUE, TRUE)" ];
-         make_simple_test
-           [ "c(TRUE, FALSE, TRUE) & TRUE" ]
-           [ "c(TRUE, FALSE, TRUE)" ];
-         make_simple_test
-           [ "c(TRUE, FALSE, TRUE) & FALSE" ]
-           [ "c(FALSE, FALSE, FALSE)" ];
-         (* RECURSIVE OPERATIONS INSIDE VECTOR *)
-         make_simple_test [ "c((2+ 8), 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
-         make_simple_test
-           [ "c((2+ 8), 8, ((10/2) + 1)) / 2" ]
-           [ "c(5., 4., 3.)" ];
-         make_simple_test [ "c(TRUE & FALSE)" ] [ "c(FALSE)" ];
-         make_simple_test [ "c(TRUE | FALSE)" ] [ "c(TRUE)" ];
-         make_simple_test [ "c(TRUE & FALSE | TRUE)" ] [ "c(TRUE)" ];
-         make_simple_test [ "c(!TRUE)" ] [ "c(FALSE)" ];
-         make_simple_test [ "c(!FALSE)" ] [ "c(TRUE)" ];
-         (********** TYPE CHECk TESTS **********)
-         make_type_check_test
-           [ "x <- 2"; "x <- c(1,2)" ]
-           [ Interp.Ast.TFloat; Interp.Ast.TVector Interp.Ast.TFloat ];
-         make_type_check_test
-           [ "x <- c(1,2)"; "y <- c(3, 4)"; "x + y" ]
-           [
-             Interp.Ast.TVector Interp.Ast.TFloat;
-             Interp.Ast.TVector Interp.Ast.TFloat;
-             Interp.Ast.TVector Interp.Ast.TFloat;
-           ];
-         make_invalid_type_check_test [ "c(1,2) + 3" ]
-           Interp.TypeCheck.bop_type_mismatch_e;
-         make_invalid_type_check_test [ "TRUE + 3" ]
-           Interp.TypeCheck.bop_type_mismatch_e;
-         make_invalid_type_check_test [ "FALSE - 3" ]
-           Interp.TypeCheck.bop_type_mismatch_e;
-         make_invalid_type_check_test [ "4 <- c(1,2)" ]
-           Interp.TypeCheck.non_var_assignment_e;
-         make_invalid_type_check_test [ "TRUE <- c(1,2)" ]
-           Interp.TypeCheck.non_var_assignment_e;
-         make_invalid_type_check_test
-           [ "FALSE & FALSE <- c(1,2)" ]
-           Interp.TypeCheck.non_var_assignment_e;
-         make_invalid_type_check_test
-           [ "c(FALSE, TRUE) & c(TRUE, FALSE) <- c(1,2)" ]
-           Interp.TypeCheck.non_var_assignment_e;
-         make_invalid_type_check_test [ "x <- c(1, c(1,2))" ]
-           Interp.TypeCheck.vector_multi_type_e;
-         make_invalid_type_check_test [ "x <- c(TRUE, 1)" ]
-           Interp.TypeCheck.vector_multi_type_e;
-         make_invalid_type_check_test
-           [ "x <- c(TRUE, c(TRUE, FALSE))" ]
-           Interp.TypeCheck.vector_multi_type_e;
-         make_invalid_type_check_test
-           [ "x <- c(TRUE, c(TRUE & FALSE))" ]
-           Interp.TypeCheck.vector_multi_type_e;
-         (********** PROCESSLINES TESTS **********)
-         ( "" >:: fun _ ->
-           assert_equal [ "7."; "NA"; "6." ]
-             (EvalAst.process_input
-                (List.map Interp.Main.parse [ "3 + 4"; "x <- 5 + 3"; "x - 2" ]))
-             ~printer:string_of_string_list );
-         ( "" >:: fun _ ->
-           assert_equal
-             [ "c(3., 5.)"; "NA"; "c(7., 9.)" ]
-             (EvalAst.process_input
-                (List.map Interp.Main.parse
-                   [ "c(1,2) + c(2,3)"; "x <- c(5,7)"; "x + c(2,2)" ]))
-             ~printer:string_of_string_list );
-         (********** MATRIX TESTS **********)
-         make_process_csv_test "sample_csv.csv"
-           Matrices.(
-             matrix
-               (Array.of_list (List.init 16 (fun i -> float_of_int (i + 1))))
-               4 4);
-         make_set_element_test "sample_csv.csv" "sample_csv2.csv" 2 2 100.;
-         make_get_element_test "sample_csv.csv" 15. 4 3;
-         make_get_element_test "sample_csv2.csv" 100. 2 2;
-         test_ncol (Matrices.process_csv "sample_csv.csv") 4;
-         test_ncol
-           (matrix
-              (Array.of_list (List.init 16 (fun i -> float_of_int (2 * i))))
-              16 1)
-           1;
-         test_nrow (Matrices.process_csv "sample_csv.csv") 4;
-         test_nrow
-           (matrix
-              (Array.of_list
-                 (List.init 16 (fun i -> float_of_int ((i * i) - 1))))
-              16 1)
-           16;
-         test_transpose
-           (Matrices.process_csv "t_sample_csv.csv")
-           (Matrices.process_csv "sample_csv.csv");
-         test_get_row
-           (Matrices.process_csv "sample_csv.csv")
-           (Array.of_list [ 1.; 2.; 3.; 4. ])
-           1;
-         test_get_row
-           (Matrices.process_csv "sample_csv3.csv")
-           (Array.of_list [ 18.; 1.; 14.; 18.; 20. ])
-           2;
-         test_get_col
-           (Matrices.process_csv "sample_csv.csv")
-           (Array.of_list [ 1.; 5.; 9.; 13. ])
-           1;
-         test_get_col
-           (Matrices.process_csv "sample_csv3.csv")
-           (Array.of_list [ 16.; 18. ])
-           4;
-         test_dot_product
-           (Array.of_list [ 1.; 2. ])
-           (Array.of_list [ 3.; 4. ])
-           11.;
-         test_dot_product
-           (Array.of_list [ 0.; 2.2; 6.; 3. ])
-           (Array.of_list [ 3.; 4.; 2.; 0. ])
-           20.8;
-         test_add_matrix
-           (Matrices.process_csv "sample_csv.csv")
-           (Matrices.process_csv "sample_csv2.csv")
-           (Matrices.process_csv "sum_csv.csv");
-         test_subtract_matrix
-           (Matrices.process_csv "sample_csv.csv")
-           (Matrices.process_csv "sample_csv2.csv")
-           (Matrices.process_csv "subtract_csv.csv");
-       ]
+  [
+    (* ********* VECTOR TESTS ********* *)
+    make_simple_test [ "c(  )" ] [ "c()" ];
+    make_simple_test [ "c(2,3)" ] [ "c(2., 3.)" ];
+    make_simple_test [ "c(2,3) + c(5,2)" ] [ "c(7., 5.)" ];
+    make_simple_test [ "c(2,3) * c(5,2)" ] [ "c(10., 6.)" ];
+    make_simple_test [ "c(2,4) / c(1, 4)" ] [ "c(2., 1.)" ];
+    make_simple_test [ "c(2,4) - c(1, 4)" ] [ "c(1., 0.)" ];
+    make_simple_test
+      [ "VARIABLE_NAME <- c(2,9)"; "VARIABLE_NAME" ]
+      [ "NA"; "c(2., 9.)" ];
+  ]
 
-let _ = run_test_tt_main vector_tests
+let value_tests =
+  [
+    (********** VALUE TESTS **********)
+    make_simple_test [ "0 + 1" ] [ "1." ];
+    make_simple_test [ "0.5 + 1" ] [ "1.5" ];
+    make_simple_test [ "2 - 1" ] [ "1." ];
+    make_simple_test [ "2.5 - 1" ] [ "1.5" ];
+    make_simple_test [ "1*2" ] [ "2." ];
+    make_simple_test [ "0.5 * 3" ] [ "1.5" ];
+    make_simple_test [ "2/1" ] [ "2." ];
+    make_simple_test [ "0.5 + 1" ] [ "1.5" ];
+    make_simple_test [ "4.5/ 1.5" ] [ "3." ];
+    make_simple_test [ "TRUE" ] [ "TRUE" ];
+    make_simple_test [ "FALSE" ] [ "FALSE" ];
+    make_simple_test [ "TRUE & TRUE" ] [ "TRUE" ];
+    make_simple_test [ "TRUE | TRUE" ] [ "TRUE" ];
+    make_simple_test [ "TRUE & FALSE" ] [ "FALSE" ];
+    make_simple_test [ "FALSE & TRUE" ] [ "FALSE" ];
+    make_simple_test [ "TRUE | FALSE" ] [ "TRUE" ];
+    make_simple_test [ "FALSE | TRUE" ] [ "TRUE" ];
+    make_simple_test [ "FALSE | TRUE | TRUE" ] [ "TRUE" ];
+    make_simple_test [ "FALSE | TRUE | FALSE" ] [ "TRUE" ];
+    (* fix parentheses precedence *)
+    (* make_simple_test [ "TRUE | (FALSE & TRUE)" ] [ "FALSE" ]; *)
+  ]
+
+let vector_float_tests =
+  [
+    (********** VECTOR-FLOAT TESTS **********)
+    make_simple_test [ "c(1, 2, 3) + 1" ] [ "c(2., 3., 4.)" ];
+    make_simple_test [ "1 + c(0, 1, 2)" ] [ "c(1., 2., 3.)" ];
+    make_simple_test [ "c(3, 2, 1) - 1" ] [ "c(2., 1., 0.)" ];
+    make_simple_test [ "c(1, 2, 3) * 2" ] [ "c(2., 4., 6.)" ];
+    make_simple_test [ "3 * c(3, 2, 1)" ] [ "c(9., 6., 3.)" ];
+    make_simple_test [ "c(10, 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
+    make_simple_test [ "1 - c(3, 2, 1)" ] [ "c(-2., -1., 0.)" ];
+    make_simple_test [ "480 / c(10, 8, 6)" ] [ "c(48., 60., 80.)" ];
+  ]
+
+let vector_bool_tests =
+  [
+    (********** VECTOR-BOOL TESTS **********)
+    make_simple_test [ "!c(TRUE, FALSE, TRUE)" ] [ "c(FALSE, TRUE, FALSE)" ];
+    make_simple_test
+      [ "c(FALSE, FALSE, FALSE) & c(FALSE, FALSE, FALSE)" ]
+      [ "c(FALSE, FALSE, FALSE)" ];
+    make_simple_test
+      [ "c(FALSE, FALSE, FALSE) | c(FALSE, FALSE, FALSE)" ]
+      [ "c(FALSE, FALSE, FALSE)" ];
+    make_simple_test
+      [ "c(FALSE, TRUE, FALSE) | c(FALSE, FALSE, FALSE)" ]
+      [ "c(FALSE, TRUE, FALSE)" ];
+    make_simple_test
+      [ "c(TRUE, TRUE, FALSE) | c(FALSE, FALSE, TRUE)" ]
+      [ "c(TRUE, TRUE, TRUE)" ];
+    make_simple_test
+      [
+        "c(TRUE, TRUE, FALSE) | c(FALSE, FALSE, TRUE) | c(FALSE, FALSE, FALSE)";
+      ]
+      [ "c(TRUE, TRUE, TRUE)" ];
+    make_simple_test
+      [
+        "c(TRUE, TRUE, FALSE) | c(FALSE, FALSE, FALSE) | c(FALSE, FALSE, TRUE)";
+      ]
+      [ "c(TRUE, TRUE, TRUE)" ];
+    make_simple_test
+      [
+        "c(TRUE, TRUE, FALSE) & c(FALSE, FALSE, FALSE) | c(FALSE, FALSE, TRUE)";
+      ]
+      [ "c(FALSE, FALSE, TRUE)" ];
+    make_simple_test
+      [ "TRUE & c(TRUE, FALSE, TRUE)" ]
+      [ "c(TRUE, FALSE, TRUE)" ];
+    make_simple_test [ "TRUE | c(TRUE, FALSE, TRUE)" ] [ "c(TRUE, TRUE, TRUE)" ];
+    make_simple_test
+      [ "c(TRUE, FALSE, TRUE) & TRUE" ]
+      [ "c(TRUE, FALSE, TRUE)" ];
+    make_simple_test
+      [ "c(TRUE, FALSE, TRUE) & FALSE" ]
+      [ "c(FALSE, FALSE, FALSE)" ];
+  ]
+
+let vector_rec_tests =
+  [
+    (* RECURSIVE OPERATIONS INSIDE VECTOR *)
+    make_simple_test [ "c((2+ 8), 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
+    make_simple_test [ "c((2+ 8), 8, ((10/2) + 1)) / 2" ] [ "c(5., 4., 3.)" ];
+    make_simple_test [ "c(TRUE & FALSE)" ] [ "c(FALSE)" ];
+    make_simple_test [ "c(TRUE | FALSE)" ] [ "c(TRUE)" ];
+    make_simple_test [ "c(TRUE & FALSE | TRUE)" ] [ "c(TRUE)" ];
+    make_simple_test [ "c(!TRUE)" ] [ "c(FALSE)" ];
+    make_simple_test [ "c(!FALSE)" ] [ "c(TRUE)" ];
+  ]
+
+let typecheck_tests =
+  [
+    (********** TYPE CHECK TESTS **********)
+    make_type_check_test
+      [ "x <- 2"; "x <- c(1,2)" ]
+      [ Interp.Ast.TFloat; Interp.Ast.TVector Interp.Ast.TFloat ];
+    make_type_check_test
+      [ "x <- c(1,2)"; "y <- c(3, 4)"; "x + y" ]
+      [
+        Interp.Ast.TVector Interp.Ast.TFloat;
+        Interp.Ast.TVector Interp.Ast.TFloat;
+        Interp.Ast.TVector Interp.Ast.TFloat;
+      ];
+    make_invalid_type_check_test [ "c(1,2) + 3" ]
+      Interp.TypeCheck.bop_type_mismatch_e;
+    make_invalid_type_check_test [ "TRUE + 3" ]
+      Interp.TypeCheck.bop_type_mismatch_e;
+    make_invalid_type_check_test [ "FALSE - 3" ]
+      Interp.TypeCheck.bop_type_mismatch_e;
+    make_invalid_type_check_test [ "4 <- c(1,2)" ]
+      Interp.TypeCheck.non_var_assignment_e;
+    make_invalid_type_check_test [ "TRUE <- c(1,2)" ]
+      Interp.TypeCheck.non_var_assignment_e;
+    make_invalid_type_check_test
+      [ "FALSE & FALSE <- c(1,2)" ]
+      Interp.TypeCheck.non_var_assignment_e;
+    make_invalid_type_check_test
+      [ "c(FALSE, TRUE) & c(TRUE, FALSE) <- c(1,2)" ]
+      Interp.TypeCheck.non_var_assignment_e;
+    make_invalid_type_check_test [ "x <- c(1, c(1,2))" ]
+      Interp.TypeCheck.vector_multi_type_e;
+    make_invalid_type_check_test [ "x <- c(TRUE, 1)" ]
+      Interp.TypeCheck.vector_multi_type_e;
+    make_invalid_type_check_test
+      [ "x <- c(TRUE, c(TRUE, FALSE))" ]
+      Interp.TypeCheck.vector_multi_type_e;
+    make_invalid_type_check_test
+      [ "x <- c(TRUE, c(TRUE & FALSE))" ]
+      Interp.TypeCheck.vector_multi_type_e;
+  ]
+
+let processlines_tests =
+  [
+    (********** PROCESSLINES TESTS **********)
+    ( "" >:: fun _ ->
+      assert_equal [ "7."; "NA"; "6." ]
+        (EvalAst.process_input
+           (List.map Interp.Main.parse [ "3 + 4"; "x <- 5 + 3"; "x - 2" ]))
+        ~printer:string_of_string_list );
+    ( "" >:: fun _ ->
+      assert_equal
+        [ "c(3., 5.)"; "NA"; "c(7., 9.)" ]
+        (EvalAst.process_input
+           (List.map Interp.Main.parse
+              [ "c(1,2) + c(2,3)"; "x <- c(5,7)"; "x + c(2,2)" ]))
+        ~printer:string_of_string_list );
+  ]
+
+let matrix_tests =
+  [
+    (********** MATRIX TESTS **********)
+    make_process_csv_test "sample_csv.csv"
+      Matrices.(
+        matrix
+          (Array.of_list (List.init 16 (fun i -> float_of_int (i + 1))))
+          4 4);
+    make_set_element_test "sample_csv.csv" "sample_csv2.csv" 2 2 100.;
+    make_get_element_test "sample_csv.csv" 15. 4 3;
+    make_get_element_test "sample_csv2.csv" 100. 2 2;
+    test_ncol (Matrices.process_csv "sample_csv.csv") 4;
+    test_ncol
+      (matrix
+         (Array.of_list (List.init 16 (fun i -> float_of_int (2 * i))))
+         16 1)
+      1;
+    test_nrow (Matrices.process_csv "sample_csv.csv") 4;
+    test_nrow
+      (matrix
+         (Array.of_list (List.init 16 (fun i -> float_of_int ((i * i) - 1))))
+         16 1)
+      16;
+    test_transpose
+      (Matrices.process_csv "t_sample_csv.csv")
+      (Matrices.process_csv "sample_csv.csv");
+    test_get_row
+      (Matrices.process_csv "sample_csv.csv")
+      (Array.of_list [ 1.; 2.; 3.; 4. ])
+      1;
+    test_get_row
+      (Matrices.process_csv "sample_csv3.csv")
+      (Array.of_list [ 18.; 1.; 14.; 18.; 20. ])
+      2;
+    test_get_col
+      (Matrices.process_csv "sample_csv.csv")
+      (Array.of_list [ 1.; 5.; 9.; 13. ])
+      1;
+    test_get_col
+      (Matrices.process_csv "sample_csv3.csv")
+      (Array.of_list [ 16.; 18. ])
+      4;
+    test_dot_product (Array.of_list [ 1.; 2. ]) (Array.of_list [ 3.; 4. ]) 11.;
+    test_dot_product
+      (Array.of_list [ 0.; 2.2; 6.; 3. ])
+      (Array.of_list [ 3.; 4.; 2.; 0. ])
+      20.8;
+    test_add_matrix
+      (Matrices.process_csv "sample_csv.csv")
+      (Matrices.process_csv "sample_csv2.csv")
+      (Matrices.process_csv "sum_csv.csv");
+    test_subtract_matrix
+      (Matrices.process_csv "sample_csv.csv")
+      (Matrices.process_csv "sample_csv2.csv")
+      (Matrices.process_csv "subtract_csv.csv");
+  ]
+
+let test_cases =
+  List.flatten
+    [
+      vector_tests;
+      value_tests;
+      vector_float_tests;
+      vector_bool_tests;
+      vector_rec_tests;
+      typecheck_tests;
+      processlines_tests;
+      matrix_tests;
+    ]
+
+let test_suite = "RCaml" >::: test_cases
+let _ = run_test_tt_main test_suite
