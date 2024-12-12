@@ -30,10 +30,11 @@ let rec typeof (env : t) e =
       | Var e -> TString
       | _ -> failwith "Not Supported")
   | Plot (vec1, vec2, expr) -> typeof_plot env vec1 vec2 expr
+  | String e -> TString
 
 and typeof_plot env vec1 vec2 expr =
-  match (typeof env vec1, typeof env vec2, expr) with
-  | TVector e1, TVector e2, Var name ->
+  match (typeof env vec1, typeof env vec2, typeof env expr) with
+  | TVector e1, TVector e2, TString ->
       if e1 = TFloat && e2 = TFloat then TVector TFloat
       else failwith "Plot Only Supported With Float Vectors"
   | _ -> failwith "Plot Only Supported With Float Vectors"

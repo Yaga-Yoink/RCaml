@@ -35,6 +35,8 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Var name ->
       (* Can't return just the name of a variable *)
       DynamicEnvironment.lookup !env name
+  | String e ->
+      String e
       (* if is_var name then get_val name else failwith "Unbound Variable" *)
   | Binop (bop, e1, e2) -> eval_bop bop (eval_big e1) (eval_big e2)
   | Vector lst -> eval_vec lst
@@ -52,7 +54,7 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
 
 and eval_plot e1 e2 name =
   match name with
-  | Var name_str -> begin
+  | Ast.String name_str -> begin
       match (e1, e2) with
       | Vector v1, Vector v2 ->
           Plotting.plot_vectors v1 v2 name_str;
@@ -218,6 +220,7 @@ let rec eval_to_string = function
   | Vector [] -> "c()"
   | Assignment (var, e) -> "NA"
   | Plot _ -> "NA"
+  | String e -> e
   (* | Var name -> eval_to_string (DynamicEnvironment.lookup !env name) *)
   | _ -> failwith "Not A Valid AST Node to Print String" [@coverage off]
 

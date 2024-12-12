@@ -4,6 +4,7 @@
 
 %token <float> FLOAT
 %token <string> VAR
+%token <string> STRINGLIT
 %token PLUS
 %token MINUS
 %token MULT
@@ -74,6 +75,7 @@ value:
     | C { Var "c" }
     | FALSE { Bool (false)}
     | TRUE { Bool (true) }
+    | e = STRINGLIT { String e }
 
 vector_values:
     | { [] }

@@ -14,6 +14,7 @@ type unop = Not
 type expr =
   | Float of float
   | Var of string
+  | String of string
   | Binop of bop * expr * expr
   | Unop of unop * expr
   | Vector of expr list

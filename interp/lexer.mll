@@ -7,6 +7,7 @@ let digit = ['0'-'9']
 let float = '-'? digit* '.'? digit+?
 let letter = ['a'-'z' 'A'-'Z']
 let id = letter (letter | digit | ('.'(letter | '_')) | '_')*
+let string_lit = ''' id '''
 
 rule read = 
     parse
@@ -33,6 +34,7 @@ rule read =
     | "function" { FUNCTION }
     | ";" { SEMICOLON }
     | "return" { RETURN } *)
+    | string_lit { STRINGLIT (Lexing.lexeme lexbuf)}
     | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
     | id { VAR ( Lexing.lexeme lexbuf ) }
     | eof { EOF }
