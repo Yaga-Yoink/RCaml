@@ -132,7 +132,7 @@ let test_subtract_matrix input1 input2 output =
 
 let vector_tests =
   [
-    (* ********* VECTOR TESTS ********* *)
+    (********** VECTOR TESTS **********)
     make_simple_test [ "c(  )" ] [ "c()" ];
     make_simple_test [ "c(2,3)" ] [ "c(2., 3.)" ];
     make_simple_test [ "c(2,3) + c(5,2)" ] [ "c(7., 5.)" ];
@@ -228,7 +228,7 @@ let vector_bool_tests =
 
 let vector_rec_tests =
   [
-    (* RECURSIVE OPERATIONS INSIDE VECTOR *)
+    (********** RECURSIVE OPERATIONS INSIDE VECTOR **********)
     make_simple_test [ "c((2+ 8), 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
     make_simple_test [ "c((2+ 8), 8, ((10/2) + 1)) / 2" ] [ "c(5., 4., 3.)" ];
     make_simple_test [ "c(TRUE & FALSE)" ] [ "c(FALSE)" ];
