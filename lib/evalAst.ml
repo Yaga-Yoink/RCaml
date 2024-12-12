@@ -55,7 +55,7 @@ and eval_plot e1 e2 name = failwith "TODO"
 
 and eval_read_csv e =
   match e with
-  | Ast.Var e -> Matrix (Matrices.to_expr (Matrices.process_csv e))
+  | Ast.Var e -> Matrix (Matrices.to_expr (Matrices.process_csv e "data/"))
   | _ -> failwith "Not Supported"
 
 and eval_unop (op : Ast.unop) (e : Ast.expr) =

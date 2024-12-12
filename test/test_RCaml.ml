@@ -11,6 +11,7 @@ let rec string_of_ast_type = function
       Printf.sprintf "TVector (%s)" (string_of_ast_type x)
   | Interp.Ast.(TBool) -> "TBool"
   | Interp.Ast.(TString) -> "TString"
+  | Interp.Ast.(TMatrix) -> "TMatrix"
 
 let string_of_string_list lst = "[" ^ String.concat "; " lst ^ "]"
 
@@ -55,22 +56,26 @@ let make_invalid_type_check_test input message =
     [input] file returns a matrix equivalent to [output]. *)
 let make_process_csv_test input output =
   "" >:: fun _ ->
-  assert_equal output (Matrices.process_csv input) ~printer:Matrices.string_of_t
+  assert_equal output
+    (Matrices.process_csv input "../data/")
+    ~printer:Matrices.string_of_t
 
 (** [make_set_element_test input output row col i] creates a test to check that
     setting value [i] in the matrix in [input] at [row] and [col] gives
     [output]. *)
 let make_set_element_test input output row col i =
-  let mat = Matrices.process_csv input in
+  let mat = Matrices.process_csv input "../data/" in
   Matrices.set_element mat row col i;
   "" >:: fun _ ->
-  assert_equal (Matrices.process_csv output) mat ~printer:Matrices.string_of_t
+  assert_equal
+    (Matrices.process_csv output "../data/")
+    mat ~printer:Matrices.string_of_t
 
 (** [make_set_element_test input output row col i] creates a test to check that
     getting the value at [row] and [col] in the matrix in [input] gives
     [output]. *)
 let make_get_element_test input output row col =
-  let mat = Matrices.process_csv input in
+  let mat = Matrices.process_csv input "../data/" in
   "" >:: fun _ ->
   assert_equal output
     (Matrices.get_element mat row col)
@@ -307,35 +312,35 @@ let matrix_tests =
     make_set_element_test "sample_csv.csv" "sample_csv2.csv" 2 2 100.;
     make_get_element_test "sample_csv.csv" 15. 4 3;
     make_get_element_test "sample_csv2.csv" 100. 2 2;
-    test_ncol (Matrices.process_csv "sample_csv.csv") 4;
+    test_ncol (Matrices.process_csv "sample_csv.csv" "../data/") 4;
     test_ncol
       (matrix
          (Array.of_list (List.init 16 (fun i -> float_of_int (2 * i))))
          16 1)
       1;
-    test_nrow (Matrices.process_csv "sample_csv.csv") 4;
+    test_nrow (Matrices.process_csv "sample_csv.csv" "../data/") 4;
     test_nrow
       (matrix
          (Array.of_list (List.init 16 (fun i -> float_of_int ((i * i) - 1))))
          16 1)
       16;
     test_transpose
-      (Matrices.process_csv "t_sample_csv.csv")
-      (Matrices.process_csv "sample_csv.csv");
+      (Matrices.process_csv "t_sample_csv.csv" "../data/")
+      (Matrices.process_csv "sample_csv.csv" "../data/");
     test_get_row
-      (Matrices.process_csv "sample_csv.csv")
+      (Matrices.process_csv "sample_csv.csv" "../data/")
       (Array.of_list [ 1.; 2.; 3.; 4. ])
       1;
     test_get_row
-      (Matrices.process_csv "sample_csv3.csv")
+      (Matrices.process_csv "sample_csv3.csv" "../data/")
       (Array.of_list [ 18.; 1.; 14.; 18.; 20. ])
       2;
     test_get_col
-      (Matrices.process_csv "sample_csv.csv")
+      (Matrices.process_csv "sample_csv.csv" "../data/")
       (Array.of_list [ 1.; 5.; 9.; 13. ])
       1;
     test_get_col
-      (Matrices.process_csv "sample_csv3.csv")
+      (Matrices.process_csv "sample_csv3.csv" "../data/")
       (Array.of_list [ 16.; 18. ])
       4;
     test_dot_product (Array.of_list [ 1.; 2. ]) (Array.of_list [ 3.; 4. ]) 11.;
@@ -344,13 +349,13 @@ let matrix_tests =
       (Array.of_list [ 3.; 4.; 2.; 0. ])
       20.8;
     test_add_matrix
-      (Matrices.process_csv "sample_csv.csv")
-      (Matrices.process_csv "sample_csv2.csv")
-      (Matrices.process_csv "sum_csv.csv");
+      (Matrices.process_csv "sample_csv.csv" "../data/")
+      (Matrices.process_csv "sample_csv2.csv" "../data/")
+      (Matrices.process_csv "sum_csv.csv" "../data/");
     test_subtract_matrix
-      (Matrices.process_csv "sample_csv.csv")
-      (Matrices.process_csv "sample_csv2.csv")
-      (Matrices.process_csv "subtract_csv.csv");
+      (Matrices.process_csv "sample_csv.csv" "../data/")
+      (Matrices.process_csv "sample_csv2.csv" "../data/")
+      (Matrices.process_csv "subtract_csv.csv" "../data/");
   ]
 
 let test_cases =
