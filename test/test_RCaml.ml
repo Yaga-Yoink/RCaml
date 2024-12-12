@@ -366,9 +366,9 @@ let matrix_tests =
       (Matrices.process_csv "sample_csv2.csv" "../data/")
       (Matrices.process_csv "subtract_csv.csv" "../data/");
     test_subtract_matrix
-      (Matrices.process_csv "sample_csv.csv")
-      (Matrices.process_csv "sample_csv2.csv")
-      (Matrices.process_csv "subtract_csv.csv");
+      (Matrices.process_csv "sample_csv.csv" "../data/")
+      (Matrices.process_csv "sample_csv2.csv" "../data/")
+      (Matrices.process_csv "subtract_csv.csv" "../data");
   ]
 
 let additional_matrix_tests =
@@ -378,11 +378,11 @@ let additional_matrix_tests =
           Matrices.process_csv "invalid_csv.csv") );
     ( "Index out of bounds test for set_element" >:: fun _ ->
       assert_raises (Failure "Index out of bounds") (fun () ->
-          let mat = Matrices.process_csv "sample_csv.csv" in
+          let mat = Matrices.process_csv "sample_csv.csv" "../data/" in
           Matrices.set_element mat 10 10 100.0) );
     ( "Index out of bounds test for get_element" >:: fun _ ->
       assert_raises (Failure "Index out of bounds") (fun () ->
-          let mat = Matrices.process_csv "sample_csv.csv" in
+          let mat = Matrices.process_csv "sample_csv.csv" "../data/" in
           Matrices.get_element mat 10 10) );
     ( "Matrix multiplication test with valid input" >:: fun _ ->
       let lmat =
