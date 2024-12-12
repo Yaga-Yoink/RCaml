@@ -27,5 +27,4 @@ let plot_vectors (vec1 : Vector.elt list) (vec2 : Vector.elt list)
 
   plline x y;
 
-  plend ();
-  Printf.printf "Plot saved as %s\n" output_file
+  plend ()
