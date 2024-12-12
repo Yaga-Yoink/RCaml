@@ -374,9 +374,9 @@ let matrix_tests =
 
 let additional_matrix_tests =
   [
-    (* ( "NotNumMat exception test" >:: fun _ -> assert_raises
-       Matrices.NotNumMat (fun () -> Matrices.process_csv "invalid_csv.csv")
-       ); *)
+    ( "NotNumMat exception test" >:: fun _ ->
+      assert_raises Matrices.NotNumMat (fun () ->
+          Matrices.process_csv "invalid_csv.csv" "../data/") );
     ( "Index out of bounds test for set_element" >:: fun _ ->
       assert_raises (Failure "Index out of bounds") (fun () ->
           let mat = Matrices.process_csv "sample_csv.csv" "../data/" in
