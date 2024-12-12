@@ -47,10 +47,16 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Return e -> failwith "TODO"
   | Bool e -> Bool e
   | Unop (op, e) -> eval_unop op (eval_big e)
-  | Readcsv e -> failwith "TODO"
+  | Readcsv e -> eval_read_csv e
+  | Matrix e -> Matrix e
   | Plot (e1, e2, name) -> eval_plot (eval_big e1) (eval_big e2) (eval_big name)
 
 and eval_plot e1 e2 name = failwith "TODO"
+
+and eval_read_csv e =
+  match e with
+  | Ast.Var e -> Matrix (Matrices.to_expr (Matrices.process_csv e))
+  | _ -> failwith "Not Supported"
 
 and eval_unop (op : Ast.unop) (e : Ast.expr) =
   match e with
@@ -209,6 +215,7 @@ let rec eval_to_string = function
   | Vector [] -> "c()"
   | Assignment (var, e) -> "NA"
   (* | Var name -> eval_to_string (DynamicEnvironment.lookup !env name) *)
+  | Readcsv _ -> "NA"
   | _ -> failwith "Not A Valid AST Node to Print String" [@coverage off]
 
 let process_input = List.map (fun line -> eval_big line |> eval_to_string)

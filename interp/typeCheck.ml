@@ -30,6 +30,7 @@ let rec typeof (env : t) e =
       | Var e -> TString
       | _ -> failwith "Not Supported")
   | Plot (vec1, vec2, expr) -> typeof_plot env vec1 vec2 expr
+  | Matrix e -> TMatrix
 
 and typeof_plot env vec1 vec2 expr = failwith "TODO"
 (* match typeof env vec1, typeof env vec2, typeof env expr with | TVector e1,
@@ -41,6 +42,7 @@ and typeof_unop env e =
   | TVector e -> TVector e
   | TBool -> TBool
   | TString -> TString
+  | TMatrix -> TMatrix
 
 and typeof_bop env e1 e2 =
   match (typeof env e1, typeof env e2) with
