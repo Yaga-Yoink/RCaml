@@ -24,11 +24,8 @@
 %token AND
 %token OR
 %token NOT
-<<<<<<< HEAD
 %token READCSV
-=======
 %token PLOT
->>>>>>> 7b06d0dea7d2b78ded3d79011dd980a18b0a5abb
 
 
 %nonassoc ASSIGNMENT
@@ -56,11 +53,8 @@ line:
     // | e1 = expr; ASSIGNMENT; FUNCTION; LPAREN; e2 = separated_list(COMMA, expr); RPAREN; LBRACE; e3 = separated_nonempty_list(SEMICOLON, expr) { Function (e1, e2, e3) }
     // | RETURN; e4 = expr; SEMICOLON; RBRACE { Return (e4) }
     | C; LPAREN; v = vector_values; RPAREN { Vector (v)}
-<<<<<<< HEAD
     | READCSV; LPAREN; e = value; RPAREN { Readcsv (e) }
-=======
     | PLOT; LPAREN; v1 = line; COMMA; v2 = line; COMMA; name = line; RPAREN { Plot (v1, v2, name)}
->>>>>>> 7b06d0dea7d2b78ded3d79011dd980a18b0a5abb
 
 binop:
     | e1 = line; MULT; e2 = line { Binop (Mult, e1, e2) }

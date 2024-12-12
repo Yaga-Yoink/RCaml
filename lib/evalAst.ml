@@ -47,13 +47,10 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Return e -> failwith "TODO"
   | Bool e -> Bool e
   | Unop (op, e) -> eval_unop op (eval_big e)
-<<<<<<< HEAD
   | Readcsv e -> failwith "TODO"
-=======
   | Plot (e1, e2, name) -> eval_plot (eval_big e1) (eval_big e2) (eval_big name)
 
 and eval_plot e1 e2 name = failwith "TODO"
->>>>>>> 7b06d0dea7d2b78ded3d79011dd980a18b0a5abb
 
 and eval_unop (op : Ast.unop) (e : Ast.expr) =
   match e with
