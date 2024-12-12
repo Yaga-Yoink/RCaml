@@ -47,6 +47,7 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Return e -> failwith "TODO"
   | Bool e -> Bool e
   | Unop (op, e) -> eval_unop op (eval_big e)
+  | Readcsv e -> failwith "TODO"
   | Plot (e1, e2, name) -> eval_plot (eval_big e1) (eval_big e2) (eval_big name)
 
 and eval_plot e1 e2 name =

@@ -21,10 +21,12 @@ type expr =
   | Function of expr * expr list * expr list
   | Return of expr
   | Bool of bool
+  | Readcsv of expr
   | Plot of expr * expr * expr
 
 (** The type representing R types. *)
 type typ =
   | TFloat
   | TBool
+  | TString
   | TVector of typ

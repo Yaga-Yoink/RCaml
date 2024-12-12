@@ -24,6 +24,7 @@
 %token AND
 %token OR
 %token NOT
+%token READCSV
 %token PLOT
 
 
@@ -52,6 +53,7 @@ line:
     // | e1 = expr; ASSIGNMENT; FUNCTION; LPAREN; e2 = separated_list(COMMA, expr); RPAREN; LBRACE; e3 = separated_nonempty_list(SEMICOLON, expr) { Function (e1, e2, e3) }
     // | RETURN; e4 = expr; SEMICOLON; RBRACE { Return (e4) }
     | C; LPAREN; v = vector_values; RPAREN { Vector (v)}
+    | READCSV; LPAREN; e = value; RPAREN { Readcsv (e) }
     | PLOT; LPAREN; v1 = line; COMMA; v2 = line; COMMA; name = line; RPAREN { Plot (v1, v2, name)}
 
 binop:
