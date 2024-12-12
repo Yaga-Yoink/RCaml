@@ -7,7 +7,7 @@ let empty = []
 
 let rec lookup (lst : t) x =
   match lst with
-  | [] -> failwith "No Binding Found"
+  | [] -> failwith "No Binding Found" [@coverage off]
   | env :: t -> if Hashtbl.mem env x then Hashtbl.find env x else lookup t x
 
 let extend (lst : t) (x : string) (ty : expr) =

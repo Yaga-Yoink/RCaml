@@ -122,6 +122,18 @@ let vector_tests =
               TRUE)";
            ]
            [ "c(FALSE, FALSE, TRUE)" ];
+         make_simple_test
+           [ "TRUE & c(TRUE, FALSE, TRUE)" ]
+           [ "c(TRUE, FALSE, TRUE)" ];
+         make_simple_test
+           [ "TRUE | c(TRUE, FALSE, TRUE)" ]
+           [ "c(TRUE, TRUE, TRUE)" ];
+         make_simple_test
+           [ "c(TRUE, FALSE, TRUE) & TRUE" ]
+           [ "c(TRUE, FALSE, TRUE)" ];
+         make_simple_test
+           [ "c(TRUE, FALSE, TRUE) & FALSE" ]
+           [ "c(FALSE, FALSE, FALSE)" ];
          (* RECURSIVE OPERATIONS INSIDE VECTOR *)
          make_simple_test [ "c((2+ 8), 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
          make_simple_test
