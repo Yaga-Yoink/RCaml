@@ -48,9 +48,27 @@ let make_invalid_type_check_test input message =
 (** [make_process_csv_test input output] creates a test to check that the
     [input] file returns a matrix equivalent to [output]. *)
 let make_process_csv_test input output =
-  print_endline (Sys.getcwd ());
   "" >:: fun _ ->
   assert_equal output (Matrices.process_csv input) ~printer:Matrices.string_of_t
+
+(** [make_set_element_test input output row col i] creates a test to check that
+    setting value [i] in the matrix in [input] at [row] and [col] gives
+    [output]. *)
+let make_set_element_test input output row col i =
+  let mat = Matrices.process_csv input in
+  Matrices.set_element mat row col i;
+  "" >:: fun _ ->
+  assert_equal (Matrices.process_csv output) mat ~printer:Matrices.string_of_t
+
+(** [make_set_element_test input output row col i] creates a test to check that
+    getting the value at [row] and [col] in the matrix in [input] gives
+    [output]. *)
+let make_get_element_test input output row col =
+  let mat = Matrices.process_csv input in
+  "" >:: fun _ ->
+  assert_equal output
+    (Matrices.get_element mat row col)
+    ~printer:string_of_float
 
 let vector_tests =
   "vector test suite"
@@ -208,6 +226,9 @@ let vector_tests =
              matrix
                (Array.of_list (List.init 16 (fun i -> float_of_int (i + 1))))
                4 4);
+         make_set_element_test "sample_csv.csv" "sample_csv2.csv" 2 2 100.;
+         make_get_element_test "sample_csv.csv" 15. 4 3;
+         make_get_element_test "sample_csv2.csv" 100. 2 2;
        ]
 
 let _ = run_test_tt_main vector_tests

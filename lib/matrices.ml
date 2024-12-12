@@ -20,23 +20,20 @@ let process_csv (fileName : string) : t =
   let string_mat =
     BatFile.lines_of ("../data/" ^ fileName)
     |> BatEnum.map (fun line ->
-           line |> String.split_on_char ' '
+           line |> String.split_on_char ','
            |> List.filter (fun word -> word <> "")
            |> Array.of_list)
     |> BatList.of_enum |> Array.of_list
   in
-  try
-    Array.map
-      (Array.map float_of_string)
-      string_mat (* convert string arrays to float arrays *)
+  try Array.map (Array.map float_of_string) string_mat
   with _ -> raise NotNumMat
 
 let set_element (arr : t) (row : int) (col : int) new_element : unit =
-  try arr.(row).(col) <- new_element
+  try arr.(row - 1).(col - 1) <- new_element
   with Invalid_argument _ -> failwith "Index out of bounds"
 
 let get_element (arr : t) (row : int) (col : int) : float =
-  try arr.(row).(col)
+  try arr.(row - 1).(col - 1)
   with Invalid_argument _ -> failwith "Index out of bounds"
 
 let matrix (vec : float array) nrow ncol : t =
