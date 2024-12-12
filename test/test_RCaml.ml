@@ -10,7 +10,6 @@ let rec string_of_ast_type = function
   | Interp.Ast.(TVector x) ->
       Printf.sprintf "TVector (%s)" (string_of_ast_type x)
   | Interp.Ast.(TBool) -> "TBool"
-  | Interp.Ast.(TString) -> "TString"
 
 let string_of_string_list lst = "[" ^ String.concat "; " lst ^ "]"
 
@@ -181,6 +180,16 @@ let vector_float_tests =
     make_simple_test [ "c(10, 8, 6) / 2" ] [ "c(5., 4., 3.)" ];
     make_simple_test [ "1 - c(3, 2, 1)" ] [ "c(-2., -1., 0.)" ];
     make_simple_test [ "480 / c(10, 8, 6)" ] [ "c(48., 60., 80.)" ];
+    ( "init_vec_of_list with valid Float list" >:: fun _ ->
+      let vec =
+        [ Interp.Ast.Float 1.2; Interp.Ast.Float 3.4; Interp.Ast.Float 5.6 ]
+      in
+      let expected = [ 1.2; 3.4; 5.6 ] in
+      assert_equal expected (init_vec_of_list vec) );
+    ( "init_vec_of_list with mixed-type list" >:: fun _ ->
+      let vec = [ Interp.Ast.Float 1.2; Interp.Ast.Bool true ] in
+      assert_raises (Failure "Expected a float expression") (fun () ->
+          init_vec_of_list vec) );
   ]
 
 let vector_bool_tests =
@@ -351,6 +360,74 @@ let matrix_tests =
       (Matrices.process_csv "sample_csv.csv")
       (Matrices.process_csv "sample_csv2.csv")
       (Matrices.process_csv "subtract_csv.csv");
+    test_subtract_matrix
+      (Matrices.process_csv "sample_csv.csv")
+      (Matrices.process_csv "sample_csv2.csv")
+      (Matrices.process_csv "subtract_csv.csv");
+  ]
+
+let additional_matrix_tests =
+  [
+    ( "NotNumMat exception test" >:: fun _ ->
+      assert_raises Matrices.NotNumMat (fun () ->
+          Matrices.process_csv "invalid_csv.csv") );
+    ( "Index out of bounds test for set_element" >:: fun _ ->
+      assert_raises (Failure "Index out of bounds") (fun () ->
+          let mat = Matrices.process_csv "sample_csv.csv" in
+          Matrices.set_element mat 10 10 100.0) );
+    ( "Index out of bounds test for get_element" >:: fun _ ->
+      assert_raises (Failure "Index out of bounds") (fun () ->
+          let mat = Matrices.process_csv "sample_csv.csv" in
+          Matrices.get_element mat 10 10) );
+    ( "Matrix multiplication test with valid input" >:: fun _ ->
+      let lmat =
+        Matrices.matrix (Array.of_list [ 1.; 2.; 3.; 4.; 5.; 6. ]) 2 3
+      in
+      let rmat =
+        Matrices.matrix (Array.of_list [ 7.; 8.; 9.; 10.; 11.; 12. ]) 3 2
+      in
+      let expected =
+        Matrices.matrix (Array.of_list [ 58.; 64.; 139.; 154. ]) 2 2
+      in
+      assert_equal expected
+        (Matrices.multiply lmat rmat)
+        ~printer:Matrices.string_of_t );
+    ( "Matrix multiplication failure due to incompatible dimensions" >:: fun _ ->
+      let lmat =
+        Matrices.matrix (Array.of_list [ 1.; 2.; 3.; 4.; 5.; 6. ]) 2 3
+      in
+      let rmat = Matrices.matrix (Array.of_list [ 7.; 8.; 9.; 10. ]) 2 2 in
+      assert_raises
+        (Failure "Multiplication cannot be performed on these matrices")
+        (fun () -> Matrices.multiply lmat rmat) );
+    ( "Matrix inversion test with a valid square matrix" >:: fun _ ->
+      let mat = Matrices.matrix (Array.of_list [ 4.; 7.; 2.; 6. ]) 2 2 in
+      let expected = [| [| 0.6; -0.7 |]; [| -0.2; 0.4 |] |] in
+      let actual = Matrices.inverse mat in
+      let epsilon = 1e-6 in
+      Array.iteri
+        (fun i row ->
+          Array.iteri
+            (fun j value ->
+              let diff = abs_float (value -. expected.(i).(j)) in
+              assert_bool
+                (Printf.sprintf
+                   "Value mismatch at (%d, %d): expected %.6f but got %.6f" i j
+                   expected.(i).(j)
+                   value)
+                (diff < epsilon))
+            row)
+        actual );
+    ( "Matrix inversion failure for non-square matrix" >:: fun _ ->
+      let mat =
+        Matrices.matrix (Array.of_list [ 1.; 2.; 3.; 4.; 5.; 6. ]) 2 3
+      in
+      assert_raises (Failure "Matrix must be square to compute its inverse")
+        (fun () -> Matrices.inverse mat) );
+    ( "Matrix inversion failure for singular matrix" >:: fun _ ->
+      let mat = Matrices.matrix (Array.of_list [ 1.; 2.; 2.; 4. ]) 2 2 in
+      assert_raises (Failure "Matrix is singular and cannot be inverted")
+        (fun () -> Matrices.inverse mat) );
   ]
 
 let test_cases =
@@ -364,6 +441,7 @@ let test_cases =
       typecheck_tests;
       processlines_tests;
       matrix_tests;
+      additional_matrix_tests;
     ]
 
 let test_suite = "RCaml" >::: test_cases
