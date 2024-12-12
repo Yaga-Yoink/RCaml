@@ -4,16 +4,31 @@ type t = float array array
 
 exception NotNumMat
 
+let string_of_t (mat : t) : string =
+  Array.map
+    (fun row ->
+      Array.mapi
+        (fun i col ->
+          if i = Array.length row - 1 then string_of_float col ^ "\n"
+          else string_of_float col ^ " ")
+        row
+      |> Array.fold_left ( ^ ) "\n")
+    mat
+  |> Array.fold_left ( ^ ) ""
+
 let process_csv (fileName : string) : t =
   let string_mat =
-    BatFile.lines_of fileName
+    BatFile.lines_of ("../data/" ^ fileName)
     |> BatEnum.map (fun line ->
            line |> String.split_on_char ' '
            |> List.filter (fun word -> word <> "")
-           |> BatSet.of_list |> BatSet.elements |> Array.of_list)
+           |> Array.of_list)
     |> BatList.of_enum |> Array.of_list
   in
-  try Array.map (Array.map float_of_string) string_mat
+  try
+    Array.map
+      (Array.map float_of_string)
+      string_mat (* convert string arrays to float arrays *)
   with _ -> raise NotNumMat
 
 let set_element (arr : t) (row : int) (col : int) new_element : unit =

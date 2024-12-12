@@ -53,3 +53,5 @@ val linear_regression : t -> t -> t
 val predict : t -> t -> float array -> float
 (** [predict obs response new_vals] returns the predicted value given the
     [new_vals] using the model created by [obs] and [response]. *)
+
+val string_of_t : t -> string

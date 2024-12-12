@@ -1,6 +1,7 @@
 open OUnit
 open RCaml
 open RCaml.Vector
+open RCaml.Matrices
 
 (** [string_of_ast_type typ] is the string representation of [typ]. *)
 let rec string_of_ast_type = function
@@ -43,6 +44,13 @@ let make_invalid_type_check_test input message =
   assert_raises ~msg:(Printf.sprintf "TypeException Raised: %s" message)
     (Interp.TypeCheck.TypeException message) (fun () ->
       List.map Interp.Main.parse input |> Interp.TypeCheck.typecheck_lines)
+
+(** [make_process_csv_test input output] creates a test to check that the
+    [input] file returns a matrix equivalent to [output]. *)
+let make_process_csv_test input output =
+  print_endline (Sys.getcwd ());
+  "" >:: fun _ ->
+  assert_equal output (Matrices.process_csv input) ~printer:Matrices.string_of_t
 
 let vector_tests =
   "vector test suite"
@@ -194,6 +202,12 @@ let vector_tests =
                 (List.map Interp.Main.parse
                    [ "c(1,2) + c(2,3)"; "x <- c(5,7)"; "x + c(2,2)" ]))
              ~printer:string_of_string_list );
+         (********** MATRIX TESTS **********)
+         make_process_csv_test "sample_csv.csv"
+           Matrices.(
+             matrix
+               (Array.of_list (List.init 16 (fun i -> float_of_int (i + 1))))
+               4 4);
        ]
 
 let _ = run_test_tt_main vector_tests
