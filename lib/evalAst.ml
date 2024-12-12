@@ -64,6 +64,7 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Return e -> failwith "TODO"
   | Bool e -> Bool e
   | Unop (op, e) -> eval_unop op (eval_big e)
+  | Readcsv e -> failwith "TODO"
 
 and eval_unop (op : Ast.unop) (e : Ast.expr) =
   match e with

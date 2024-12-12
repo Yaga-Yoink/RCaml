@@ -24,6 +24,7 @@
 %token AND
 %token OR
 %token NOT
+%token READCSV
 
 
 %nonassoc ASSIGNMENT
@@ -51,6 +52,7 @@ line:
     // | e1 = expr; ASSIGNMENT; FUNCTION; LPAREN; e2 = separated_list(COMMA, expr); RPAREN; LBRACE; e3 = separated_nonempty_list(SEMICOLON, expr) { Function (e1, e2, e3) }
     // | RETURN; e4 = expr; SEMICOLON; RBRACE { Return (e4) }
     | C; LPAREN; v = vector_values; RPAREN { Vector (v)}
+    | READCSV; LPAREN; e = value; RPAREN { Readcsv (e) }
 
 binop:
     | e1 = line; MULT; e2 = line { Binop (Mult, e1, e2) }

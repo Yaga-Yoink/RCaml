@@ -26,6 +26,7 @@ rule read =
     | "&" { AND }
     | "|" { OR }
     | "!" { NOT }
+    | "read.csv" { READCSV }
     (* | "{" { LBRACE } 
     | "}" { RBRACE }
     | "function" { FUNCTION }

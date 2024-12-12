@@ -10,6 +10,7 @@ let rec string_of_ast_type = function
   | Interp.Ast.(TVector x) ->
       Printf.sprintf "TVector (%s)" (string_of_ast_type x)
   | Interp.Ast.(TBool) -> "TBool"
+  | Interp.Ast.(TString) -> "TString"
 
 let string_of_string_list lst = "[" ^ String.concat "; " lst ^ "]"
 

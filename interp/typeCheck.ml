@@ -25,12 +25,17 @@ let rec typeof (env : t) e =
   | Return e -> failwith "TODO"
   | Bool e -> TBool
   | Unop (unop, e) -> typeof_unop env e
+  | Readcsv e -> (
+      match e with
+      | Var e -> TString
+      | _ -> failwith "Not Supported")
 
 and typeof_unop env e =
   match typeof env e with
   | TFloat -> TFloat
   | TVector e -> TVector e
   | TBool -> TBool
+  | TString -> TString
 
 and typeof_bop env e1 e2 =
   match (typeof env e1, typeof env e2) with
