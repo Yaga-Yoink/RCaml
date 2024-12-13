@@ -136,7 +136,7 @@ and eval_plot e1 e2 name =
 
 and eval_read_csv e =
   match e with
-  | Ast.Var e -> Matrix (Matrices.to_expr (Matrices.process_csv e "data/"))
+  | Ast.String e -> Matrix (Matrices.to_expr (Matrices.process_csv e ""))
   | _ -> failwith "Not Supported"
 
 and eval_unop (op : Ast.unop) (e : Ast.expr) =

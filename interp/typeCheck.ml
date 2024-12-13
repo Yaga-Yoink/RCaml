@@ -29,7 +29,7 @@ let rec typeof (env : t) e =
   | Unop (unop, e) -> typeof_unop env e
   | Readcsv e -> (
       match e with
-      | Var e -> TString
+      | String e -> TString
       | _ -> failwith "Not Supported")
   | Plot (vec1, vec2, expr) -> typeof_plot env vec1 vec2 expr
   | String e -> TString
