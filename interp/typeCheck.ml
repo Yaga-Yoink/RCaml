@@ -77,6 +77,7 @@ and typeof_bop env e1 e2 =
   | TFloat, TFloat -> TFloat
   | TVector e1, TVector e2 ->
       if e1 = e2 then TVector e1 else raise (TypeException bop_type_mismatch_e)
+  | TVector TFloat, TFloat | TFloat, TVector TFloat -> TVector TFloat
   | TBool, TBool -> TBool
   | TMatrix, TMatrix -> TMatrix
   | _ -> raise (TypeException bop_type_mismatch_e)

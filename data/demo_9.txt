@@ -1,0 +1,6 @@
+i_mat <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)
+inv(i_mat)
+t(i_mat)
+i_mat[1, 1]
+i_mat[1, 2]
+i_mat[1,1] <- 3

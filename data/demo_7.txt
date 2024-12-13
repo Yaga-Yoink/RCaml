@@ -1,0 +1,7 @@
+false_vec <- c(FALSE, FALSE, FALSE, FALSE)
+true_vec <- c(TRUE, TRUE, TRUE, TRUE)
+alt_vec <- c(TRUE, FALSE, TRUE, FALSE)
+!false_vec
+true_vec & false_vec
+alt_vec | false_vec
+alt_vec | (!false_vec)
