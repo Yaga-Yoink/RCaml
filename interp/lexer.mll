@@ -40,13 +40,7 @@ rule read =
     | "t" { T }
     | "lm" { LM }
     | "predict" { PREDICT }
-    (* | "{" { LBRACE } 
-    | "}" { RBRACE }
-    | "function" { FUNCTION }
-    | ";" { SEMICOLON }
-    | "return" { RETURN } *)
     | string_lit { STRINGLIT (let matched_string = Lexing.lexeme lexbuf in String.sub matched_string 1 (String.length matched_string - 2))}
     | float { FLOAT (float_of_string (Lexing.lexeme lexbuf)) }
     | id { VAR ( Lexing.lexeme lexbuf ) }
     | eof { EOF }
-
