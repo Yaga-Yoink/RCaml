@@ -55,6 +55,15 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Matrix e -> Matrix e
   | Plot (e1, e2, name) -> eval_plot (eval_big e1) (eval_big e2) (eval_big name)
   | FlatMatrix (vec, nrow, ncol) -> eval_flatmatrix (eval_big vec) nrow ncol
+  | LinearModel (obs, resp) -> eval_linearmodel (eval_big obs) (eval_big resp)
+
+and eval_linearmodel obs resp =
+  match (obs, resp) with
+  | Matrix m1, Matrix m2 ->
+      Matrix Matrices.(linear_regression (of_expr m1) (of_expr m2) |> to_expr)
+  | _ ->
+      failwith "The Observation and Response Parameters Must Be Matrices"
+      [@coverage off]
 
 and eval_matrix_assignment unop mat_name v =
   match unop with

@@ -36,6 +36,7 @@
 %token NCOL
 %token INV
 %token T
+%token LM
 
 
 %nonassoc ASSIGNMENT
@@ -68,6 +69,7 @@ line:
     | MATRIX; LPAREN; vec = line; COMMA; NROW; EQUAL; rown = line; COMMA; NCOL; EQUAL; coln = line; RPAREN { FlatMatrix (vec, rown, coln) }
     | INV; LPAREN; matrix = line; RPAREN { Unop (MatrixInverse, matrix ) }
     | T; LPAREN; matrix = line; RPAREN { Unop (MatrixTranspose, matrix)}
+    | LM; LPAREN; obs = line; COMMA; responses = line; RPAREN { LinearModel (obs, responses) }
 
 binop:
     | e1 = line; MULT; e2 = line { Binop (Mult, e1, e2) }

@@ -23,6 +23,7 @@ type expr =
   | Plot of expr * expr * expr
   | Matrix of expr list list
   | FlatMatrix of expr * expr * expr
+  | LinearModel of expr * expr
 
 (** The type of unary operators. *)
 and unop =

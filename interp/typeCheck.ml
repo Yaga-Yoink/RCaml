@@ -34,6 +34,12 @@ let rec typeof (env : t) e =
   | String e -> TString
   | Matrix e -> TMatrix
   | FlatMatrix (vec, nrow, ncol) -> typeof_flatmatrix env vec nrow ncol
+  | LinearModel (obs, resp) -> typeof_linearmodel env obs resp
+
+and typeof_linearmodel env obs resp =
+  match (typeof env obs, typeof env resp) with
+  | TMatrix, TMatrix -> TMatrix
+  | _ -> failwith "The Observation and Response Parameters Must Be Matrices"
 
 and typeof_flatmatrix env vec nrow ncol =
   match typeof env vec with

@@ -38,6 +38,7 @@ rule read =
     | "ncol" { NCOL }
     | "inv" { INV }
     | "t" { T }
+    | "lm" { LM }
     (* | "{" { LBRACE } 
     | "}" { RBRACE }
     | "function" { FUNCTION }
