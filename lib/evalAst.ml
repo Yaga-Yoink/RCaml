@@ -266,6 +266,17 @@ and eval_bop (bop : Ast.bop) (e1 : Ast.expr) (e2 : Ast.expr) : Ast.expr =
       | Or -> bool_h b1 b2 Value.Bool.orr'
       | _ -> failwith "Not A Supported Binop For Booleans" [@coverage off]
     end
+  | Matrix m1, Matrix m2 -> begin
+      let mat_bop_h bop m1 m2 =
+        Ast.Matrix
+          (bop (Matrices.of_expr m1) (Matrices.of_expr m2) |> Matrices.to_expr)
+      in
+      match bop with
+      | Add -> mat_bop_h Matrices.add m1 m2
+      | Minus -> mat_bop_h Matrices.subtract m1 m2
+      | Mult -> mat_bop_h Matrices.multiply m1 m2
+      | _ -> failwith "Not A Supported Operation" [@coverage off]
+    end
   | _ -> failwith "Not A Supported Operation" [@coverage off]
 
 (** [eval_to_string x] is the string representation of [x]. *)

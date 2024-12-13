@@ -65,6 +65,7 @@ and typeof_bop env e1 e2 =
   | TVector e1, TVector e2 ->
       if e1 = e2 then TVector e1 else raise (TypeException bop_type_mismatch_e)
   | TBool, TBool -> TBool
+  | TMatrix, TMatrix -> TMatrix
   | _ -> raise (TypeException bop_type_mismatch_e)
 
 and typeof_vector env lst =

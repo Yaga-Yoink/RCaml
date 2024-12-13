@@ -4,17 +4,34 @@ type t = float array array
 
 exception NotNumMat
 
+(** [matr_string_header mat] is the string representation of the header which
+    shows the number of columns for the matrix in the string representation of
+    the matrix. Requires: [mat] is not empty. *)
+let matr_string_header mat =
+  let string_header = ref "" in
+  Array.iteri
+    (fun index _ ->
+      if index <> 0 then
+        string_header := Printf.sprintf "    %s [,%i]" !string_header (index + 1)
+      else string_header := Printf.sprintf "[,%i]" (index + 1))
+    mat.(0);
+  !string_header
+
 let string_of_t (mat : t) : string =
-  Array.map
-    (fun row ->
-      Array.mapi
-        (fun i col ->
-          if i = Array.length row - 1 then string_of_float col ^ "\n"
-          else string_of_float col ^ " ")
-        row
-      |> Array.fold_left ( ^ ) "\n")
-    mat
-  |> Array.fold_left ( ^ ) ""
+  let row_counter = ref 0 in
+  matr_string_header mat
+  ^ (Array.map
+       (fun row ->
+         incr row_counter;
+         Printf.sprintf "%s"
+           (Array.mapi
+              (fun i col ->
+                if i = Array.length row - 1 then string_of_float col ^ ""
+                else string_of_float col ^ "  ")
+              row
+           |> Array.fold_left ( ^ ) (Printf.sprintf "\n[%i,] " !row_counter)))
+       mat
+    |> Array.fold_left ( ^ ) "")
 
 let process_csv (fileName : string) dir : t =
   let string_mat =
