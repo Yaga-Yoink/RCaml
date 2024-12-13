@@ -37,7 +37,7 @@
 %token INV
 %token T
 %token LM
-
+%token PREDICT
 
 %nonassoc ASSIGNMENT
 // nonassoc, no defined behavior for multiple assignments in the same expression
@@ -70,6 +70,7 @@ line:
     | INV; LPAREN; matrix = line; RPAREN { Unop (MatrixInverse, matrix ) }
     | T; LPAREN; matrix = line; RPAREN { Unop (MatrixTranspose, matrix)}
     | LM; LPAREN; obs = line; COMMA; responses = line; RPAREN { LinearModel (obs, responses) }
+    | PREDICT; LPAREN; obs = line; COMMA; responses = line; COMMA; values = line; RPAREN { Predict (obs, responses, values) }
 
 binop:
     | e1 = line; MULT; e2 = line { Binop (Mult, e1, e2) }

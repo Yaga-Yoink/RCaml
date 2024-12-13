@@ -39,6 +39,7 @@ rule read =
     | "inv" { INV }
     | "t" { T }
     | "lm" { LM }
+    | "predict" { PREDICT }
     (* | "{" { LBRACE } 
     | "}" { RBRACE }
     | "function" { FUNCTION }

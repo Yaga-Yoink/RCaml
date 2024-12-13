@@ -24,6 +24,7 @@ type expr =
   | Matrix of expr list list
   | FlatMatrix of expr * expr * expr
   | LinearModel of expr * expr
+  | Predict of expr * expr * expr
 
 (** The type of unary operators. *)
 and unop =

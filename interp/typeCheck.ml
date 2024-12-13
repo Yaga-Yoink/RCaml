@@ -35,6 +35,12 @@ let rec typeof (env : t) e =
   | Matrix e -> TMatrix
   | FlatMatrix (vec, nrow, ncol) -> typeof_flatmatrix env vec nrow ncol
   | LinearModel (obs, resp) -> typeof_linearmodel env obs resp
+  | Predict (obs, resp, values) -> typeof_predict env obs resp values
+
+and typeof_predict env obs resp values =
+  match (typeof env obs, typeof env resp, typeof env values) with
+  | TMatrix, TMatrix, TVector e -> TFloat
+  | _ -> failwith "The Inputs Must Be in Order A Matrix, Matrix, and Vector"
 
 and typeof_linearmodel env obs resp =
   match (typeof env obs, typeof env resp) with
