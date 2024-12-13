@@ -11,9 +11,10 @@ let print_help () =
   print_endline
     "Supported operations:\n\
      \tValues: + - * / \n\
-     \tVectors: + - * / \n\
+     \tValue Vectors: + - * / \n\
+     \tBool Vectors: & | !\n\
      \tMatrices: transpose; dot product; multiply; inverse; linear regression; \
-     prediction"
+     prediction; plotting"
 
 let fileProcessor (fileName : string) : Ast.expr list =
   BatFile.lines_of fileName
