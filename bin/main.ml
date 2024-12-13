@@ -1,6 +1,4 @@
 open Batteries
-
-(* open RCaml.ProcessLines *)
 open Interp
 open RCaml.EvalAst
 

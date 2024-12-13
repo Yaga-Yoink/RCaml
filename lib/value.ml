@@ -2,7 +2,7 @@ open Interp
 
 module Number = struct
   type t = float
-  (* Values are represented by a float (subject to change). *)
+  (* AF: The float v represents a number. RI: None*)
 
   let add = ( +. )
   let mult = ( *. )
@@ -26,7 +26,7 @@ open Interp
 
 module Bool = struct
   type t = bool
-  (* Values are represented by a boolean. *)
+  (* AF: The boolean b is represented by a boolean. RI: None*)
 
   let and' x y = x && y
   let orr' x y = x || y
