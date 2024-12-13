@@ -1,0 +1,6 @@
+obs <- matrix(c(1.,86.,1.,1.,45.,0.,1.,53.,1.,1.,32.,1.,1.,99.,0.,1.,82.,1.), nrow = 6, ncol = 3)
+obs
+resp <- matrix(c(22.,39.,32.,38.,18.,34.), nrow = 6, ncol = 1)
+resp
+work <- inv(t(obs) * obs) * t(obs) * resp
+work
