@@ -1,0 +1,9 @@
+a <- matrix(c(1,0,0,0,1,0,0,0,1), nrow = 3, ncol = 3)
+a
+b <- inv(a)
+b
+c <- t(a)
+c
+b * c
+a - b
+b - c
