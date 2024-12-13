@@ -329,6 +329,15 @@ let typecheck_tests =
     make_invalid_type_check_test
       [ "x <- c(TRUE, c(TRUE & FALSE))" ]
       Interp.TypeCheck.vector_multi_type_e;
+    make_invalid_type_check_test
+      [ "x <- plot(c(1,2), 1, 4)" ]
+      Interp.TypeCheck.float_vector_plot_e;
+    make_invalid_type_check_test
+      [ "x <- plot(c(1,2), c(2,3), 1)" ]
+      Interp.TypeCheck.float_vector_plot_e;
+    make_invalid_type_check_test
+      [ "x <- plot(c(1,2), c(TRUE,FALSE), 'name')" ]
+      Interp.TypeCheck.float_vector_plot_e;
   ]
 
 let processlines_tests =
@@ -457,6 +466,13 @@ let matrix_tests =
         Interp.Ast.TVector Interp.Ast.TFloat;
         Interp.Ast.TFloat;
       ];
+    make_simple_test
+      [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)" ]
+      [ "NA" ];
+    make_simple_test
+      [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)"; "x[1,1]" ]
+      [ "NA"; "1." ];
+    make_simple_test [ "x <- read.csv('../data/sample_csv.csv')" ] [ "NA" ];
   ]
 
 let additional_matrix_tests =

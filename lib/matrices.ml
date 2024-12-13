@@ -12,8 +12,8 @@ let matr_string_header mat =
   Array.iteri
     (fun index _ ->
       if index <> 0 then
-        string_header := Printf.sprintf "    %s [,%i]" !string_header (index + 1)
-      else string_header := Printf.sprintf "[,%i]" (index + 1))
+        string_header := Printf.sprintf "%s [,%i]" !string_header (index + 1)
+      else string_header := Printf.sprintf "    [,%i]" (index + 1))
     mat.(0);
   !string_header
 

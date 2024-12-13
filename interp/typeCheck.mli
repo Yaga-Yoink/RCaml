@@ -18,3 +18,7 @@ val bop_type_mismatch_e : string
 
 val vector_multi_type_e : string
 (** The error message when a vector has more than one type of element. *)
+
+val float_vector_plot_e : string
+(** The error message when the arguments passed to plot are not float vectors
+    and a string for name. *)

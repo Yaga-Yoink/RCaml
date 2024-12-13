@@ -10,6 +10,7 @@ let non_var_assignment_e =
 
 let bop_type_mismatch_e = "Binary Operator Operands Have Different Types"
 let vector_multi_type_e = "Vector Has More Than One Type of Element"
+let float_vector_plot_e = "Plot Only Supported With Float Vectors"
 
 (** [typeof env e] is the type of the expression [e] in the static environment
     [env]. Raises: TypeException if [e] is not well-typed. *)
@@ -60,8 +61,8 @@ and typeof_plot env vec1 vec2 expr =
   match (typeof env vec1, typeof env vec2, typeof env expr) with
   | TVector e1, TVector e2, TString ->
       if e1 = TFloat && e2 = TFloat then TVector TFloat
-      else failwith "Plot Only Supported With Float Vectors"
-  | _ -> failwith "Plot Only Supported With Float Vectors"
+      else raise (TypeException float_vector_plot_e)
+  | _ -> raise (TypeException float_vector_plot_e)
 
 and typeof_unop env e =
   match typeof env e with
