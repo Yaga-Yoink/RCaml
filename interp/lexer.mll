@@ -37,6 +37,7 @@ rule read =
     | "nrow" { NROW } 
     | "ncol" { NCOL }
     | "inv" { INV }
+    | "t" { T }
     (* | "{" { LBRACE } 
     | "}" { RBRACE }
     | "function" { FUNCTION }

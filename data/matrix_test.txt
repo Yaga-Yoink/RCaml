@@ -1,5 +1,6 @@
 x <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2)
 y <- matrix(c(2, 2, 2, 2), nrow = 2, ncol = 2)
+t(x)
 x
 x[1,1]
 x[1,2]
