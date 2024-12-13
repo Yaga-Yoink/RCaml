@@ -12,6 +12,8 @@ val process_csv : string -> string -> t
     the entries cannot be processes as floats. *)
 
 val to_float_arr_arr : t -> float array array
+(** [to_float_arr_arr mat] returns the float array array representation of
+    [mat]. *)
 
 val matrix : float array -> int -> int -> t
 (** [matrix vec nrow ncol] returns a matrix with [nrow] rows and [ncol] columns,
@@ -37,7 +39,11 @@ val dot_product : float array -> float array -> float
 (** [dot_product vec1 vec2] returns the dot product of [vec1] and [vec2]. *)
 
 val add : t -> t -> t
+(** [add lmat rmat] returns the sum of the two matrices [lmat] and [rmat]. *)
+
 val subtract : t -> t -> t
+(** [subtract lmat rmat] returns the difference of the two matrices [lmat] and
+    [rmat]. *)
 
 val multiply : t -> t -> t
 (** [multiply lmat rmat] returns the product of [lmat] and [rmat] where [lmat]
