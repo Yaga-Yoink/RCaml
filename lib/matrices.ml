@@ -118,7 +118,7 @@ let inverse (mat : t) =
       let temp = augmented.(i) in
       augmented.(i) <- augmented.(!max_row);
       augmented.(!max_row) <- temp;
-      if augmented.(i).(i) = 0.0 then
+      if augmented.(i).(i) >= -1. *. 1e-6 && augmented.(i).(i) <= 1e-6 then
         failwith "Matrix is singular and cannot be inverted";
       let pivot = augmented.(i).(i) in
       for j = 0 to (2 * n) - 1 do
