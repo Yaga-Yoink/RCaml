@@ -19,6 +19,7 @@ let rec typeof (env : t) e =
   | Var name -> lookup !env name
   | Binop (bop, e1, e2) -> typeof_bop env e1 e2
   | Vector lst -> typeof_vector env lst
+  | Assignment (Unop (unop, Var mat_name), Float v) -> TMatrix
   | Assignment (Var name, e2) -> typeof_assignment env name e2
   | Assignment (e1, e2) -> raise (TypeException non_var_assignment_e)
   | Function (name, lst1, lst2) -> failwith "TODO"

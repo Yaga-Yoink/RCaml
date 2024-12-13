@@ -40,6 +40,8 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
       (* if is_var name then get_val name else failwith "Unbound Variable" *)
   | Binop (bop, e1, e2) -> eval_bop bop (eval_big e1) (eval_big e2)
   | Vector lst -> eval_vec lst
+  | Assignment (Unop (unop, Var mat_name), Float v) ->
+      eval_matrix_assignment unop mat_name v
   | Assignment (Var name, e2) ->
       env := DynamicEnvironment.extend !env name (eval_big e2);
       Assignment (Var name, e2)
@@ -53,6 +55,30 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Matrix e -> Matrix e
   | Plot (e1, e2, name) -> eval_plot (eval_big e1) (eval_big e2) (eval_big name)
   | FlatMatrix (vec, nrow, ncol) -> eval_flatmatrix (eval_big vec) nrow ncol
+
+and eval_matrix_assignment unop mat_name v =
+  match unop with
+  | Ast.MatrixIndex (Float i, Float j) ->
+      let matrix = DynamicEnvironment.lookup !env mat_name in
+      begin
+        match matrix with
+        | Matrix m ->
+            let mut_matrix = Matrices.of_expr m in
+            Matrices.set_element mut_matrix (int_of_float i) (int_of_float j) v;
+            env :=
+              DynamicEnvironment.extend !env mat_name
+                (Matrix (mut_matrix |> Matrices.to_expr));
+            Matrix (mut_matrix |> Matrices.to_expr)
+        | _ ->
+            failwith
+              "Variable Must Be Bound To A Matrix To Get The Value At An Index"
+            [@coverage off]
+      end
+      (* Matrices.set_element (DynamicEnvironment.lookup !env mat_name |>
+         Matrices.of_expr) i j v *)
+  | _ ->
+      failwith "Only Matrix Index Assignments are Currently Supported"
+      [@coverage off]
 
 and eval_flatmatrix vec nrow ncol =
   match (nrow, ncol) with
