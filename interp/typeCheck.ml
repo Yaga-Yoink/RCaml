@@ -32,6 +32,16 @@ let rec typeof (env : t) e =
   | Plot (vec1, vec2, expr) -> typeof_plot env vec1 vec2 expr
   | String e -> TString
   | Matrix e -> TMatrix
+  | FlatMatrix (vec, nrow, ncol) -> typeof_flatmatrix env vec nrow ncol
+
+and typeof_flatmatrix env vec nrow ncol =
+  match typeof env vec with
+  | TVector TFloat -> begin
+      match (typeof env nrow, typeof env ncol) with
+      | TFloat, TFloat -> TMatrix
+      | _ -> failwith "The Number of Row and Columns Must Be An Integer"
+    end
+  | _ -> failwith "Only Float Matrices Are Currently Supported"
 
 and typeof_plot env vec1 vec2 expr =
   match (typeof env vec1, typeof env vec2, typeof env expr) with

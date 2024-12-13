@@ -28,6 +28,12 @@
 %token NOT
 %token READCSV
 %token PLOT
+// %token LBRACKET
+// %token RBRACKET
+%token MATRIX
+%token EQUAL
+%token NROW
+%token NCOL
 
 
 %nonassoc ASSIGNMENT
@@ -57,6 +63,7 @@ line:
     | C; LPAREN; v = vector_values; RPAREN { Vector (v)}
     | READCSV; LPAREN; e = value; RPAREN { Readcsv (e) }
     | PLOT; LPAREN; v1 = line; COMMA; v2 = line; COMMA; name = line; RPAREN { Plot (v1, v2, name)}
+    | MATRIX; LPAREN; vec = line; COMMA; NROW; EQUAL; rown = line; COMMA; NCOL; EQUAL; coln = line; RPAREN { FlatMatrix (vec, rown, coln) }
 
 binop:
     | e1 = line; MULT; e2 = line { Binop (Mult, e1, e2) }

@@ -25,6 +25,7 @@ type expr =
   | Readcsv of expr
   | Plot of expr * expr * expr
   | Matrix of expr list list
+  | FlatMatrix of expr * expr * expr
 
 (** The type representing R types. *)
 type typ =

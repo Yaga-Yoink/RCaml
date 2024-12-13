@@ -52,6 +52,28 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Readcsv e -> eval_read_csv e
   | Matrix e -> Matrix e
   | Plot (e1, e2, name) -> eval_plot (eval_big e1) (eval_big e2) (eval_big name)
+  | FlatMatrix (vec, nrow, ncol) -> eval_flatmatrix (eval_big vec) nrow ncol
+
+and eval_flatmatrix vec nrow ncol =
+  match (nrow, ncol) with
+  | Float nrow, Float ncol ->
+      let nrow = nrow in
+      let ncol = ncol in
+      begin
+        match vec with
+        | Vector v ->
+            Matrix
+              (Matrices.matrix
+                 (Vector.init_vec_of_list v |> Array.of_list)
+                 (int_of_float nrow) (int_of_float ncol)
+              |> Matrices.to_expr)
+        | _ ->
+            failwith "First Input To Matrix Creation Must be a Vector"
+            [@coverage off]
+      end
+  | _ ->
+      failwith "The Number of Rows and Columns Must Be An Integer Value"
+      [@coverage off]
 
 and eval_plot e1 e2 name =
   match name with
@@ -227,6 +249,7 @@ let rec eval_to_string = function
   | Assignment (var, e) -> "NA"
   | Plot _ -> "NA"
   | String e -> e
+  | Matrix m -> Matrices.string_of_t (Matrices.of_expr m)
   (* | Var name -> eval_to_string (DynamicEnvironment.lookup !env name) *)
   | Readcsv _ -> "NA"
   | _ -> failwith "Not A Valid AST Node to Print String" [@coverage off]

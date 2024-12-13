@@ -30,6 +30,12 @@ rule read =
     | "!" { NOT }
     | "read.csv" { READCSV }
     | "plot" { PLOT }
+    (* | "[" { LBRACKET }
+    | "]" { RBRACKET } *)
+    | "matrix" { MATRIX }
+    | "=" { EQUAL }
+    | "nrow" { NROW } 
+    | "ncol" { NCOL }
     (* | "{" { LBRACE } 
     | "}" { RBRACE }
     | "function" { FUNCTION }

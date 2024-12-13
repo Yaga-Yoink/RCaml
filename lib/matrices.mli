@@ -57,8 +57,7 @@ val get_element : t -> int -> int -> float
 
 val linear_regression : t -> t -> t
 (** [linear_regression obs response] returns the beta/intercept values, an n x 1
-    matrix, given the observations in [obs] and the response matrix [response].
-*)
+    matrix, given the observations in [obs] and the response matrix [response]. *)
 
 val predict : t -> t -> float array -> float
 (** [predict obs response new_vals] returns the predicted value given the
