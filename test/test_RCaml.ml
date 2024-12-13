@@ -472,7 +472,17 @@ let matrix_tests =
     make_simple_test
       [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)"; "x[1,1]" ]
       [ "NA"; "1." ];
-    make_simple_test [ "x <- read.csv('../data/sample_csv.csv')" ] [ "NA" ];
+    make_simple_test
+      [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)"; "x[1,2]" ]
+      [ "NA"; "1." ];
+    make_simple_test
+      [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)"; "x[2,1]" ]
+      [ "NA"; "3." ];
+    make_simple_test
+      [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)"; "x[2,2]" ]
+      [ "NA"; "4." ];
+    (* make_simple_test [ "x <- read.csv(../data/sample_csv.csv)" ] [ "NA" ];
+       make_simple_test [ "x <- read.csv(../data/sample_csv.csv)" ] [ "NA" ]; *)
   ]
 
 let additional_matrix_tests =
