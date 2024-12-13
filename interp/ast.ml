@@ -28,6 +28,7 @@ type expr =
 and unop =
   | Not
   | MatrixIndex of expr * expr
+  | MatrixInverse
 
 (** The type representing R types. *)
 type typ =

@@ -423,7 +423,22 @@ let additional_matrix_tests =
                    value)
                 (diff < epsilon))
             row)
-        actual );
+        (let gen_arr =
+           Array.make
+             (List.length (actual |> Matrices.to_expr))
+             (Array.make 1 0.0)
+         in
+         List.iteri
+           (fun index x -> gen_arr.(index) <- Array.of_list x)
+           (actual |> Matrices.to_expr
+           |> List.map (fun row ->
+                  List.map
+                    (fun v ->
+                      match v with
+                      | Interp.Ast.Float f -> f
+                      | _ -> failwith "TODO")
+                    row));
+         gen_arr) );
     ( "Matrix inversion failure for non-square matrix" >:: fun _ ->
       let mat =
         Matrices.matrix (Array.of_list [ 1.; 2.; 3.; 4.; 5.; 6. ]) 2 3

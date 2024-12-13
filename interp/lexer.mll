@@ -36,6 +36,7 @@ rule read =
     | "=" { EQUAL }
     | "nrow" { NROW } 
     | "ncol" { NCOL }
+    | "inv" { INV }
     (* | "{" { LBRACE } 
     | "}" { RBRACE }
     | "function" { FUNCTION }

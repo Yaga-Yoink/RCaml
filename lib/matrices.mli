@@ -41,7 +41,7 @@ val multiply : t -> t -> t
 (** [multiply lmat rmat] returns the product of [lmat] and [rmat] where [lmat]
     is the left matrix and [rmat] is the right matrix. *)
 
-val inverse : t -> float array array
+val inverse : t -> t
 (** [inverse mat] returns the inverse of [mat]. *)
 
 val set_element : t -> int -> int -> float -> unit

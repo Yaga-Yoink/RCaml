@@ -145,6 +145,7 @@ and eval_unop (op : Ast.unop) (e : Ast.expr) =
           Float
             (Matrices.get_element (Matrices.of_expr e) (int_of_float i)
                (int_of_float j))
+      | MatrixInverse -> Matrix Matrices.(of_expr e |> inverse |> to_expr)
       | _ ->
           failwith "Matrix Indexing is the Only Currently Supported Unop"
           [@coverage off]

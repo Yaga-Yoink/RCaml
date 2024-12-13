@@ -9,3 +9,5 @@ x[1,1] <- 2
 x + y
 x - y
 x * y
+x <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)
+inv(x)

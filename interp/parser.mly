@@ -34,6 +34,7 @@
 %token EQUAL
 %token NROW
 %token NCOL
+%token INV
 
 
 %nonassoc ASSIGNMENT
@@ -64,6 +65,7 @@ line:
     | READCSV; LPAREN; e = value; RPAREN { Readcsv (e) }
     | PLOT; LPAREN; v1 = line; COMMA; v2 = line; COMMA; name = line; RPAREN { Plot (v1, v2, name)}
     | MATRIX; LPAREN; vec = line; COMMA; NROW; EQUAL; rown = line; COMMA; NCOL; EQUAL; coln = line; RPAREN { FlatMatrix (vec, rown, coln) }
+    | INV; LPAREN; matrix = line; RPAREN { Unop (MatrixInverse, matrix ) }
 
 binop:
     | e1 = line; MULT; e2 = line { Binop (Mult, e1, e2) }
