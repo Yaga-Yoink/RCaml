@@ -416,6 +416,47 @@ let matrix_tests =
       (Matrices.process_csv "responses.csv" "../data/")
       (Array.of_list [ 21.; 1. ])
       43.20667;
+    make_type_check_test
+      [ "matrix(c(1., 1., 3., 4.), nrow = 2, ncol = 2)" ]
+      [ Interp.Ast.TMatrix ];
+    make_type_check_test
+      [
+        "matrix(c(1., 1., 3., 4.), nrow = 2, ncol = 2) + matrix(c(1., 1., 3., \
+         4.), nrow = 2, ncol = 2)";
+      ]
+      [ Interp.Ast.TMatrix ];
+    make_type_check_test
+      [
+        "matrix(c(1., 1., 3., 4.), nrow = 2, ncol = 2) - matrix(c(1., 1., 3., \
+         4.), nrow = 2, ncol = 2)";
+      ]
+      [ Interp.Ast.TMatrix ];
+    make_type_check_test
+      [
+        "matrix(c(1., 1., 3., 4.), nrow = 2, ncol = 2) * matrix(c(1., 1., 3., \
+         4.), nrow = 2, ncol = 2)";
+      ]
+      [ Interp.Ast.TMatrix ];
+    make_type_check_test
+      [
+        "d <- matrix(c(0, 1), nrow = 2, ncol = 1)";
+        "y <- matrix(c(2, 0, 0, 4), nrow = 2, ncol = 2)";
+        "lm(d, y)";
+      ]
+      [ Interp.Ast.TMatrix; Interp.Ast.TMatrix; Interp.Ast.TMatrix ];
+    make_type_check_test
+      [
+        "d <- matrix(c(0, 1), nrow = 2, ncol = 1)";
+        "y <- matrix(c(2, 0, 0, 4), nrow = 2, ncol = 2)";
+        "new_vals <- c(2)";
+        "predict(d, y, new_vals)";
+      ]
+      [
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TVector Interp.Ast.TFloat;
+        Interp.Ast.TFloat;
+      ];
   ]
 
 let additional_matrix_tests =
