@@ -1,6 +1,12 @@
 open Batteries
 
 type t = float array array
+(** AF: a float array m, where m.(i).(j) repreeents the element at row i + 1 and
+    column j + 1 of the matrix representes a matrix M. The matrix has dimensions
+    Array.length m by Array.length m.(0).
+
+    RI: Array.length m and Array.length m.(0) >= 1. All elements are valid float
+    values. The length of each row and each column is the same. *)
 
 exception NotNumMat
 
