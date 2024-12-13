@@ -13,7 +13,15 @@ let rec string_of_ast_type = function
   | Interp.Ast.(TMatrix) -> "TMatrix"
   | Interp.Ast.(TString) -> "TString"
 
+(** [string_of_string_list lst] returns a string representation of the string
+    list [lst]. *)
 let string_of_string_list lst = "[" ^ String.concat "; " lst ^ "]"
+
+(** [string_of_bool_arr arr] returns a string representation of the array of
+    boolean values [arr]. *)
+let string_of_bool_arr arr =
+  let bool_to_string b = if b then "true" else "false" in
+  String.concat " " (Array.to_list (Array.map bool_to_string arr))
 
 (** [string_of_float_array arr] returns the string representation of input array
     [arr]. *)
@@ -134,6 +142,35 @@ let test_add_matrix input1 input2 output =
 let test_subtract_matrix input1 input2 output =
   "" >:: fun _ ->
   assert_equal output (Matrices.subtract input1 input2) ~printer:string_of_t
+
+(** [test_linear_model input_obs input_resp output] creates a test to check that
+    the linear model from [input_obs] and [input_resp] matches the parameter
+    values in [output]. *)
+let test_linear_model input_obs input_resp output =
+  let output = Matrices.to_float_arr_arr output in
+  let epsilon = 1e-4 in
+  let model = Matrices.linear_regression input_obs input_resp in
+  let diff =
+    Array.mapi
+      (fun i row -> row.(0) -. output.(i).(0))
+      (Matrices.to_float_arr_arr model)
+  in
+  let close_to_zero = Array.map (fun i -> abs_float i <= epsilon) diff in
+  "" >:: fun _ ->
+  assert_equal
+    (Array.init (Array.length diff) (fun i -> true))
+    close_to_zero ~printer:string_of_bool_arr
+
+(** [test_predict input_obs input_resp input_new output] creates a test to check
+    that the linear model from [input_obs] and [input_resp] predicted on the
+    values in [input_new] is close to [output]. *)
+let test_predict input_obs input_resp input_new output =
+  let epsilon = 1e-4 in
+  let preds = Matrices.predict input_obs input_resp input_new in
+  "" >:: fun _ ->
+  assert_equal true
+    (abs_float (output -. preds) <= epsilon)
+    ~printer:string_of_bool
 
 let vector_tests =
   [
@@ -370,6 +407,15 @@ let matrix_tests =
       (Matrices.process_csv "sample_csv.csv" "../data/")
       (Matrices.process_csv "sample_csv2.csv" "../data/")
       (Matrices.process_csv "subtract_csv.csv" "../data/");
+    test_linear_model
+      (Matrices.process_csv "observations.csv" "../data/")
+      (Matrices.process_csv "responses.csv" "../data/")
+      (Matrices.matrix (Array.of_list [ 48.44983; -0.27708; 0.57554 ]) 3 1);
+    test_predict
+      (Matrices.process_csv "observations.csv" "../data/")
+      (Matrices.process_csv "responses.csv" "../data/")
+      (Array.of_list [ 21.; 1. ])
+      43.20667;
   ]
 
 let additional_matrix_tests =

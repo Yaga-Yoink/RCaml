@@ -17,6 +17,8 @@ let matr_string_header mat =
     mat.(0);
   !string_header
 
+let to_float_arr_arr (mat : t) : float array array = mat
+
 let string_of_t (mat : t) : string =
   let row_counter = ref 0 in
   matr_string_header mat

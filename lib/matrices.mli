@@ -11,6 +11,8 @@ val process_csv : string -> string -> t
     CSV and each element in the row representing a field. Raises [NotNumMat] if
     the entries cannot be processes as floats. *)
 
+val to_float_arr_arr : t -> float array array
+
 val matrix : float array -> int -> int -> t
 (** [matrix vec nrow ncol] returns a matrix with [nrow] rows and [ncol] columns,
     initialized by row from input vector [vec]. Raises failure if the matrix
