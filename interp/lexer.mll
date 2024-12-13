@@ -8,7 +8,7 @@ let digit = ['0'-'9']
 let float = '-'? digit* '.'? digit+?
 let letter = ['a'-'z' 'A'-'Z']
 let id = letter (letter | digit | ('.'(letter | '_')) | '_')*
-let string_lit = ''' (id)'''
+let string_lit = ''' (white | id | '/')+ '''
 
 rule read = 
     parse
