@@ -2,6 +2,11 @@ open Ast
 open Hashtbl
 
 type t = (string, typ) Hashtbl.t list
+(** AF: The stack of hashtables
+    [{(k11, v11), ..., (k1n, v1n)}; {(kj1, vj1), ... (kjn, vjn)}] represents the
+    static environment where {(k11, v11), ... (k1n, v1n)} is the most recent 
+    static environment with keys kjn bound to type vjn . 
+    RI: none *)
 
 let empty = []
 

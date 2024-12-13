@@ -385,7 +385,7 @@ let typecheck_tests =
         Interp.Ast.TMatrix;
         Interp.Ast.TMatrix;
       ];
-    make_invalid_type_check_test [ "c(1,2) + 3" ]
+    make_invalid_type_check_test [ "c(1,2) - TRUE" ]
       Interp.TypeCheck.bop_type_mismatch_e;
     make_invalid_type_check_test [ "TRUE + 3" ]
       Interp.TypeCheck.bop_type_mismatch_e;
