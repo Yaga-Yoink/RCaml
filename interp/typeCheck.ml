@@ -99,5 +99,4 @@ and typeof_assignment env name e2 =
 
 (* (** [typecheck e] checks whether [e] is well-typed in the empty static
    environment. *) let typecheck e = typeof StaticEnvironment.empty e *)
-
 let typecheck_lines e = List.map (typeof (ref StaticEnvironment.empty)) e

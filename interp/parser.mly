@@ -16,11 +16,6 @@
 %token COMMA
 %token C
 %token EOF
-// %token LBRACE
-// %token RBRACE
-// %token FUNCTION
-// %token SEMICOLON
-// %token RETURN
 %token TRUE
 %token FALSE
 %token AND
@@ -61,8 +56,6 @@ line:
     | e = unop { e } 
     | LPAREN; e = line; RPAREN { e }
     // figure out how to get rid of the shift reduce conflict here
-    // | e1 = expr; ASSIGNMENT; FUNCTION; LPAREN; e2 = separated_list(COMMA, expr); RPAREN; LBRACE; e3 = separated_nonempty_list(SEMICOLON, expr) { Function (e1, e2, e3) }
-    // | RETURN; e4 = expr; SEMICOLON; RBRACE { Return (e4) }
     | C; LPAREN; v = vector_values; RPAREN { Vector (v)}
     | READCSV; LPAREN; e = line; RPAREN { Readcsv (e) }
     | PLOT; LPAREN; v1 = line; COMMA; v2 = line; COMMA; name = line; RPAREN { Plot (v1, v2, name)}

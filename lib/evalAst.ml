@@ -35,9 +35,7 @@ let rec eval_big (e : Ast.expr) : Ast.expr =
   | Var name ->
       (* Can't return just the name of a variable *)
       DynamicEnvironment.lookup !env name
-  | String e ->
-      String e
-      (* if is_var name then get_val name else failwith "Unbound Variable" *)
+  | String e -> String e
   | Binop (bop, e1, e2) -> eval_bop bop (eval_big e1) (eval_big e2)
   | Vector lst -> eval_vec lst
   | Assignment (Unop (unop, Var mat_name), Float v) ->
@@ -96,8 +94,6 @@ and eval_matrix_assignment unop mat_name v =
               "Variable Must Be Bound To A Matrix To Get The Value At An Index"
             [@coverage off]
       end
-      (* Matrices.set_element (DynamicEnvironment.lookup !env mat_name |>
-         Matrices.of_expr) i j v *)
   | _ ->
       failwith "Only Matrix Index Assignments are Currently Supported"
       [@coverage off]
