@@ -8,4 +8,6 @@ obs <- matrix(c(86.,1.,45.,0.,53.,1.,32.,1.,99.,0.,82.,1.), nrow = 6, ncol = 2)
 obs
 resp <- matrix(c(22.,39.,32.,38.,18.,34.), nrow = 6, ncol = 1)
 resp
+resp2 <- read.csv('responses.csv')
+resp + resp2
 lm(obs, resp)
