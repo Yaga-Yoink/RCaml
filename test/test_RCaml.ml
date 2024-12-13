@@ -42,6 +42,16 @@ let make_simple_test input (output : string list) =
     (List.map Interp.Main.parse input |> EvalAst.process_input)
     ~printer:string_of_string_list
 
+(** [make_equality_test input output] is the assert_equal OUnit test for
+    comparing an [input] and [output] where [input] and [output] is R source
+    code that should be equivalent semantically. *)
+let make_equality_test input (output : string list) =
+  "" >:: fun _ ->
+  assert_equal
+    (List.map Interp.Main.parse output |> EvalAst.process_input)
+    (List.map Interp.Main.parse input |> EvalAst.process_input)
+    ~printer:string_of_string_list
+
 (** [make_type_check_test input output] is the asssert_equal OUnit test for
     comparing a type-checked parsed [input] with an expected [output] of the
     types. *)
@@ -176,6 +186,7 @@ let vector_tests =
   [
     (********** VECTOR TESTS **********)
     make_simple_test [ "c(  )" ] [ "c()" ];
+    make_simple_test [ "c()" ] [ "c()" ];
     make_simple_test [ "c(2,3)" ] [ "c(2., 3.)" ];
     make_simple_test [ "c(2,3) + c(5,2)" ] [ "c(7., 5.)" ];
     make_simple_test [ "c(2,3) * c(5,2)" ] [ "c(10., 6.)" ];
@@ -184,6 +195,9 @@ let vector_tests =
     make_simple_test
       [ "VARIABLE_NAME <- c(2,9)"; "VARIABLE_NAME" ]
       [ "NA"; "c(2., 9.)" ];
+    make_simple_test
+      [ "variable_name <- c(TRUE, FALSE)"; "variable_name" ]
+      [ "NA"; "c(TRUE, FALSE)" ];
   ]
 
 let value_tests =
@@ -288,6 +302,8 @@ let vector_rec_tests =
     make_simple_test [ "c(TRUE & FALSE | TRUE)" ] [ "c(TRUE)" ];
     make_simple_test [ "c(!TRUE)" ] [ "c(FALSE)" ];
     make_simple_test [ "c(!FALSE)" ] [ "c(TRUE)" ];
+    make_simple_test [ "!c(!FALSE)" ] [ "c(FALSE)" ];
+    make_simple_test [ "!c(!FALSE) & c(!FALSE)" ] [ "c(FALSE)" ];
   ]
 
 let typecheck_tests =
@@ -303,15 +319,104 @@ let typecheck_tests =
         Interp.Ast.TVector Interp.Ast.TFloat;
         Interp.Ast.TVector Interp.Ast.TFloat;
       ];
+    make_type_check_test
+      [
+        "x <- c(TRUE, FALSE)";
+        "y <- c(FALSE, TRUE)";
+        "x & y";
+        "!x";
+        "x | y";
+        "!(x & y) & (x | x & x & !y)";
+      ]
+      [
+        Interp.Ast.TVector Interp.Ast.TBool;
+        Interp.Ast.TVector Interp.Ast.TBool;
+        Interp.Ast.TVector Interp.Ast.TBool;
+        Interp.Ast.TVector Interp.Ast.TBool;
+        Interp.Ast.TVector Interp.Ast.TBool;
+        Interp.Ast.TVector Interp.Ast.TBool;
+      ];
+    make_type_check_test
+      [
+        "x <- TRUE";
+        "y <- FALSE";
+        "x & y";
+        "!x";
+        "!(x & y)";
+        "!(x | y)";
+        "(x & (x & (x & !x)))";
+      ]
+      [
+        Interp.Ast.TBool;
+        Interp.Ast.TBool;
+        Interp.Ast.TBool;
+        Interp.Ast.TBool;
+        Interp.Ast.TBool;
+        Interp.Ast.TBool;
+        Interp.Ast.TBool;
+      ];
+    make_type_check_test
+      [ "x <- matrix(c(1), nrow = 1, ncol = 1)" ]
+      [ Interp.Ast.TMatrix ];
+    make_type_check_test
+      [
+        "x <- matrix(c(1), nrow = 1, ncol = 1)";
+        "y <- matrix(c(2), nrow = 1, ncol = 1)";
+        "x + y";
+        "x - y";
+        "x *y";
+        "inv(x)";
+        "t(x)";
+        "t(x) + inv(x) - y";
+        "x[1, 2]";
+        "y <- x[1, 2]";
+        "x[1,2] <- 2";
+      ]
+      [
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+        Interp.Ast.TMatrix;
+      ];
     make_invalid_type_check_test [ "c(1,2) + 3" ]
       Interp.TypeCheck.bop_type_mismatch_e;
     make_invalid_type_check_test [ "TRUE + 3" ]
       Interp.TypeCheck.bop_type_mismatch_e;
     make_invalid_type_check_test [ "FALSE - 3" ]
       Interp.TypeCheck.bop_type_mismatch_e;
+    make_invalid_type_check_test
+      [ "matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2) + 1" ]
+      Interp.TypeCheck.bop_type_mismatch_e;
+    make_invalid_type_check_test
+      [ "x <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2)"; "inv(x) + 1" ]
+      Interp.TypeCheck.bop_type_mismatch_e;
+    make_invalid_type_check_test
+      [ "x <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2)"; "t(x) + 1" ]
+      Interp.TypeCheck.bop_type_mismatch_e;
+    make_invalid_type_check_test
+      [ "x <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2)"; "t(x) * 1" ]
+      Interp.TypeCheck.bop_type_mismatch_e;
+    make_invalid_type_check_test
+      [ "x <- matrix(c(0), nrow = 1, ncol = 1)"; "x - x + 1" ]
+      Interp.TypeCheck.bop_type_mismatch_e;
+    make_invalid_type_check_test
+      [ "x <- matrix(c(0), nrow = 1, ncol = 1)"; "inv((x - x) + 1)" ]
+      Interp.TypeCheck.bop_type_mismatch_e;
     make_invalid_type_check_test [ "4 <- c(1,2)" ]
       Interp.TypeCheck.non_var_assignment_e;
     make_invalid_type_check_test [ "TRUE <- c(1,2)" ]
+      Interp.TypeCheck.non_var_assignment_e;
+    make_invalid_type_check_test
+      [ "matrix(c(1), nrow = 1, ncol = 1) <- c(1,2)" ]
+      Interp.TypeCheck.non_var_assignment_e;
+    make_invalid_type_check_test [ "x[1,1] <- c(1,2)" ]
       Interp.TypeCheck.non_var_assignment_e;
     make_invalid_type_check_test
       [ "FALSE & FALSE <- c(1,2)" ]
@@ -330,6 +435,9 @@ let typecheck_tests =
       [ "x <- c(TRUE, c(TRUE & FALSE))" ]
       Interp.TypeCheck.vector_multi_type_e;
     make_invalid_type_check_test
+      [ "x <- plot(c(1,2), c(1, c(2)), 'name')" ]
+      Interp.TypeCheck.vector_multi_type_e;
+    make_invalid_type_check_test
       [ "x <- plot(c(1,2), 1, 4)" ]
       Interp.TypeCheck.float_vector_plot_e;
     make_invalid_type_check_test
@@ -337,6 +445,9 @@ let typecheck_tests =
       Interp.TypeCheck.float_vector_plot_e;
     make_invalid_type_check_test
       [ "x <- plot(c(1,2), c(TRUE,FALSE), 'name')" ]
+      Interp.TypeCheck.float_vector_plot_e;
+    make_invalid_type_check_test
+      [ "x <- plot(4, 4, 'name')" ]
       Interp.TypeCheck.float_vector_plot_e;
   ]
 
@@ -481,8 +592,76 @@ let matrix_tests =
     make_simple_test
       [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)"; "x[2,2]" ]
       [ "NA"; "4." ];
-    (* make_simple_test [ "x <- read.csv(../data/sample_csv.csv)" ] [ "NA" ];
-       make_simple_test [ "x <- read.csv(../data/sample_csv.csv)" ] [ "NA" ]; *)
+    make_simple_test
+      [
+        "d <- matrix(c(0, 1), nrow = 2, ncol = 1)";
+        "y <- matrix(c(2, 0, 0, 4), nrow = 2, ncol = 2)";
+        "new_vals <- c(2)";
+        "predict(d, y, new_vals)";
+      ]
+      [ "NA"; "NA"; "NA"; "-2." ];
+    make_simple_test
+      [
+        "d <- matrix(c(0, 1), nrow = 2, ncol = 1)";
+        "y <- matrix(c(1, 0, 0, 4), nrow = 2, ncol = 2)";
+        "new_vals <- c(2)";
+        "predict(d, y, new_vals)";
+      ]
+      [ "NA"; "NA"; "NA"; "-1." ];
+    make_equality_test
+      [
+        "d <- matrix(c(0, 1), nrow = 2, ncol = 1)";
+        "y <- matrix(c(1, 0, 0, 4), nrow = 2, ncol = 2)";
+        "new_vals <- c(2)";
+        "predict(d, y, new_vals)";
+      ]
+      [
+        "y <- matrix(c(2, 1, 3, 5), nrow = 2, ncol = 2)";
+        "d <- matrix(c(2), nrow = 1, ncol = 1)";
+        "p <- 2";
+        "-1.";
+      ];
+    make_equality_test
+      [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)"; "x[1,2]" ]
+      [ "y <- matrix(c(2, 1, 3, 5), nrow = 2, ncol = 2)"; "y[1,2]" ];
+    make_equality_test
+      [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)"; "x[1,2] <- 5." ]
+      [ "y <- matrix(c(1, 200, 3, 4), nrow = 2, ncol = 2)"; "y[1,2] <- 5." ];
+    make_equality_test
+      [ "x <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2)"; "t(x)" ]
+      [ "y <- matrix(c(1, 3, 2, 4), nrow = 2, ncol = 2)"; "y" ];
+    make_equality_test
+      [ "x <- matrix(c(1), nrow = 1, ncol = 1)"; "t(x)" ]
+      [ "y <- matrix(c(1), nrow = 1, ncol = 1)"; "y" ];
+    make_equality_test
+      [ "x <- matrix(c(1), nrow = 1, ncol = 1)"; "inv(x)" ]
+      [ "y <- matrix(c(1), nrow = 1, ncol = 1)"; "y" ];
+    make_equality_test
+      [ "x <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "inv(x)" ]
+      [ "y <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "y" ];
+    make_equality_test
+      [ "x <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "x + x" ]
+      [ "y <- matrix(c(2, 0, 0, 2), nrow = 2, ncol = 2)"; "y" ];
+    make_equality_test
+      [ "x <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "x - x" ]
+      [ "y <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)"; "y" ];
+    make_equality_test
+      [ "x <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "inv(x) - inv(x)" ]
+      [ "y <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)"; "y" ];
+    make_equality_test
+      [
+        "x <- matrix(c(1 + 1, 0, 0, 1), nrow = 2, ncol = 2)"; "inv(x) - inv(x)";
+      ]
+      [ "y <- matrix(c(2 + 1 - 1 - 1 - 1, 0, 0, 0), nrow = 2, ncol = 2)"; "y" ];
+    make_equality_test
+      [ "x <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "x - x * x" ]
+      [ "y <- matrix(c(0, 0, 0, 0), nrow = 2, ncol = 2)"; "y" ];
+    make_equality_test
+      [ "x <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "x * x" ]
+      [ "y <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "y" ];
+    make_equality_test
+      [ "x <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "x * x * x * x" ]
+      [ "y <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)"; "y" ];
   ]
 
 let additional_matrix_tests =
@@ -565,7 +744,15 @@ let additional_matrix_tests =
   ]
 
 let plot_tests =
-  [ make_simple_test [ "plot(c(1,2), c(2,4), 'name')" ] [ "NA" ] ]
+  [
+    make_simple_test [ "plot(c(1,2), c(2,4), 'name')" ] [ "NA" ];
+    make_simple_test
+      [ "plot(c(1,2, 3, 4), c(3, 4, 5, 6), 'cool_name')" ]
+      [ "NA" ];
+    make_equality_test
+      [ "plot(c(1,2, 3, 4), c(3, 4, 5, 6), 'cool_name')" ]
+      [ "plot(c(1,2), c(2,4), 'name')" ];
+  ]
 
 let test_cases =
   List.flatten
