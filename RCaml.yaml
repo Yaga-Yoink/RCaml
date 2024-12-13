@@ -20,7 +20,7 @@ title: "RCaml"
 # OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
 git-repo: "https://github.coecis.cornell.edu/ak2498/RCaml.git"
 # Replace the URL with your own demo video.
-demo-video-url: "https://www.youtube.com/watch?feature=shared&v=saCkEPQw8bY"
+demo-video-url: "https://youtu.be/K9eqJOHK0HE"
 # Write a short, attention-grabbing description of your project.
 desc: >
   Our project, RCaml, is an interactive statistical computing environment, bringing core features of the R programming language into OCaml. It supports essential operations for data manipulation, statistical modeling, and a range of built-in statistical functions to simplify common analyses. Users can explore data, run workflows, and interact with data frames and statistical models through a command-line interface.
