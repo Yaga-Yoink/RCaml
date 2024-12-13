@@ -593,6 +593,15 @@ let matrix_tests =
       [ "x <- matrix(c(1, 1, 3, 4), nrow = 2, ncol = 2)"; "x[2,2]" ]
       [ "NA"; "4." ];
     make_simple_test
+      [ "x <- matrix(c(1), nrow = 1, ncol = 1)"; "x[1,1]" ]
+      [ "NA"; "1." ];
+    make_simple_test
+      [ "x <- matrix(c(1), nrow = 1, ncol = 1)"; "x[1,1] + 2." ]
+      [ "NA"; "3." ];
+    make_simple_test
+      [ "x <- matrix(c(1), nrow = 1, ncol = 1)"; "x[1,1] / 2." ]
+      [ "NA"; "0.5" ];
+    make_simple_test
       [
         "d <- matrix(c(0, 1), nrow = 2, ncol = 1)";
         "y <- matrix(c(2, 0, 0, 4), nrow = 2, ncol = 2)";
