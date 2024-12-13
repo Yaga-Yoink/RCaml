@@ -1,4 +1,4 @@
-4 +    3
+4 + 3
 z <- c(1,2,3)
-x <- read.csv(sample_csv.csv)
+x <- read.csv('data/sample_csv.csv')
 x
