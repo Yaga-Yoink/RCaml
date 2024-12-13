@@ -30,8 +30,8 @@ rule read =
     | "!" { NOT }
     | "read.csv" { READCSV }
     | "plot" { PLOT }
-    (* | "[" { LBRACKET }
-    | "]" { RBRACKET } *)
+    | "[" { LBRACKET }
+    | "]" { RBRACKET }
     | "matrix" { MATRIX }
     | "=" { EQUAL }
     | "nrow" { NROW } 

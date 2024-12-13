@@ -64,5 +64,11 @@ val predict : t -> t -> float array -> float
     [new_vals] using the model created by [obs] and [response]. *)
 
 val string_of_t : t -> string
+(** [string_of_t mat] is the string representation of the matrix [mat]. *)
+
 val to_expr : t -> Interp.Ast.expr list list
+(** [to_expr mat] is the matrix [mat] represented as a list of lists of AST
+    nodes. *)
+
 val of_expr : Interp.Ast.expr list list -> t
+(** [of_expr ast_matrix] is the matrix [ast_matrix] as a Matrices type. *)

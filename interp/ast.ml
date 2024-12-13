@@ -7,9 +7,6 @@ type bop =
   | And
   | Or
 
-(** The type of unary operators. *)
-type unop = Not
-
 (** The type of the abstract syntax tree. *)
 type expr =
   | Float of float
@@ -26,6 +23,11 @@ type expr =
   | Plot of expr * expr * expr
   | Matrix of expr list list
   | FlatMatrix of expr * expr * expr
+
+(** The type of unary operators. *)
+and unop =
+  | Not
+  | MatrixIndex of expr * expr
 
 (** The type representing R types. *)
 type typ =

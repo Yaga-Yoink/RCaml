@@ -28,8 +28,8 @@
 %token NOT
 %token READCSV
 %token PLOT
-// %token LBRACKET
-// %token RBRACKET
+%token LBRACKET
+%token RBRACKET
 %token MATRIX
 %token EQUAL
 %token NROW
@@ -76,6 +76,7 @@ binop:
 
 unop:
     | NOT; e1 = line { Unop (Not, e1) }
+    | e = value; LBRACKET; row_index = value; COMMA; col_index = value; RBRACKET { Unop (MatrixIndex (row_index, col_index), e)}
 
 value:
     | f = FLOAT { Float f }

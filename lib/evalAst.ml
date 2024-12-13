@@ -98,6 +98,9 @@ and eval_unop (op : Ast.unop) (e : Ast.expr) =
       | Not ->
           Value.Bool.value_of_expr b |> Value.Bool.not'
           |> Value.Bool.expr_of_value
+      | _ ->
+          failwith "Only Not Unop Is Currently Supported for Booleans"
+          [@coverage off]
     end
   | Ast.Vector (h :: t) -> begin
       match (h, op) with
@@ -109,6 +112,16 @@ and eval_unop (op : Ast.unop) (e : Ast.expr) =
                  |> Value.Bool.expr_of_value)
                (h :: t))
       | _ -> failwith "Operation Not Currently Supported" [@coverage off]
+    end
+  | Matrix e -> begin
+      match op with
+      | MatrixIndex (Float i, Float j) ->
+          Float
+            (Matrices.get_element (Matrices.of_expr e) (int_of_float i)
+               (int_of_float j))
+      | _ ->
+          failwith "Matrix Indexing is the Only Currently Supported Unop"
+          [@coverage off]
     end
   | _ -> failwith "Expression Does Not Support Unops" [@coverage off]
 

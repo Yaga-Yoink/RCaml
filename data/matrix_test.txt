@@ -1,2 +1,6 @@
-x <- matrix(c(1,2, 3, 4), nrow = 2, ncol = 2)
+x <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2)
 x
+x[1,1]
+x[1,2]
+x[2,1]
+x[2,2]
